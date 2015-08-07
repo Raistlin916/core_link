@@ -6,6 +6,9 @@ let MainTable = require('./main_table');
 let ThemeManager = new mui.Styles.ThemeManager();
 let AppBar = mui.AppBar;
 
+let SecondaryTable = require('./secondary_table');
+let DetailChart = require('./detail_chart');
+
 let Dashboard = React.createClass({
 
   childContextTypes: {
@@ -24,6 +27,8 @@ let Dashboard = React.createClass({
         <AppBar title="核心链路数据监控" />
         <div style={{margin: '20px auto', width: '1000px'}}>
           <MainTable/>
+          <SecondaryTable/>
+          <DetailChart/>
         </div>
       </div>
     )
