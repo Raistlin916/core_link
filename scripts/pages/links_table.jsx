@@ -1,13 +1,19 @@
 let React = require('react');
 let mui = require('material-ui');
 let Table = mui.Table;
+let hack = require('../utils/hack');
+let Link = require('react-router').Link;
 
 module.exports = React.createClass({
   render: function () {
     let rowData = [
-      {linkName: {content: '注册'}, feature: {content: '支付'}, URL: {content: 'http://trade.koudaitong.com/wxpay/confirm'}, QPS: {content: 1000}, trend: {content: '5%'}, RT: {content:'0.5'} },
-      {linkName: {content: '下单'}, feature: {content: '支付'}, URL: {content: 'http://trade.koudaitong.com/wxpay/confirm'}, QPS: {content: 1000}, trend: {content: '5%'}, RT: {content:'0.5'} }
+      {linkName: {content: <Link to="detail" params={{id: '1'}}>注册</Link>}
+        , feature: {content: '支付'}, URL: {content: 'http://trade.koudaitong.com/wxpay/confirm'}, QPS: {content: 1000}, trend: {content: '5%'}, RT: {content:'0.5'} },
+      {linkName: {content: <Link to="detail" params={{id: '2'}}>下单</Link>}
+        , feature: {content: '支付'}, URL: {content: 'http://trade.koudaitong.com/wxpay/confirm'}, QPS: {content: 1000}, trend: {content: '5%'}, RT: {content:'0.5'} }
     ];
+
+    hack.wrapNum(rowData);
 
     // State
     this.state = {
