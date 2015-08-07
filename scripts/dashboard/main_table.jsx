@@ -1,6 +1,7 @@
 let React = require('react');
 let mui = require('material-ui');
 let Table = mui.Table;
+let hack = require('../utils/hack');
 
 module.exports = React.createClass({
   render: function () {
@@ -12,20 +13,8 @@ module.exports = React.createClass({
 
 
     //转换数字
-    function wrapNum() {
-      rowData.forEach(function(item) {
-        for(var key in item){
-          var value = item[key].content;
-          if(React.Children.count(value) === 1){
-            if(!isNaN(value)){
-              value = <span>{value}</span>;
-            }
-          }
-          item[key].content = value;
-        }
-      })
-    };
-    wrapNum(rowData);
+   
+    hack.wrapNum(rowData);
     
     // State
     this.state = {
