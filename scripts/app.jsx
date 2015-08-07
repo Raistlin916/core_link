@@ -1,15 +1,15 @@
 require('normalize.css');
-require('./dashboard.css');
 let React = require('react');
+let Router = require('react-router');
 let mui = require('material-ui');
-let MainTable = require('./main_table');
 let ThemeManager = new mui.Styles.ThemeManager();
 let AppBar = mui.AppBar;
+let RouteHandler = Router.RouteHandler;
+let injectTapEventPlugin = require('react-tap-event-plugin');
+injectTapEventPlugin();
 
-let SecondaryTable = require('./secondary_table');
-let DetailChart = require('./detail_chart');
 
-let Dashboard = React.createClass({
+let App = React.createClass({
 
   childContextTypes: {
     muiTheme: React.PropTypes.object
@@ -25,10 +25,8 @@ let Dashboard = React.createClass({
     return (
       <div>
         <AppBar title="核心链路数据监控" />
-        <div style={{margin: '20px auto', width: '1000px'}}>
-          <MainTable/>
-          <SecondaryTable/>
-          <DetailChart/>
+        <div style={{width: '1000px', margin: '40px auto'}}>
+          <RouteHandler></RouteHandler>
         </div>
       </div>
     )
@@ -37,4 +35,4 @@ let Dashboard = React.createClass({
 });
 
 
-module.exports = Dashboard;
+module.exports = App;

@@ -2,16 +2,23 @@ let React = require('react');
 let mui = require('material-ui');
 let Table = mui.Table;
 let hack = require('../utils/hack');
+let Link = require('react-router').Link;
 
 module.exports = React.createClass({
   render: function () {
     let rowData = [
-      {linkName: {content: '注册'}, feature: {content: '支付'}, URL: {content: 'http://trade.koudaitong.com/wxpay/confirm'}, QPS: {content: 1000}, trend: {content: '5%'}, RT: {content:'0.5'} },
-      {linkName: {content: '下单'}, feature: {content: '支付'}, URL: {content: 'http://trade.koudaitong.com/wxpay/confirm'}, QPS: {content: 1000}, trend: {content: '5%'}, RT: {content:'0.5'} }
+      {linkName: {content: <Link to="links" params={{name: 'register'}}>注册</Link>}
+        , QPS: {content:'1000'}, trend: {content: '10%'}, RT: {content:'0.5'} },
+      {linkName: {content: <Link to="links" params={{name: 'order'}}>下单</Link>}
+        , QPS: {content: '1500'}, trend: {content: '5%'}, RT: {content:'0.3'} },
+      {linkName: {content: <Link to="links" params={{name: 'goods'}}>商品市场</Link>}
+        , QPS: {content: '1200'}, trend: {content: '5%'}, RT: {content:'0.4'} },
     ];
 
-    hack.wrapNum(rowData);
 
+    //转换数字   
+    hack.wrapNum(rowData);
+    
     // State
     this.state = {
       fixedHeader: true,
@@ -31,12 +38,6 @@ module.exports = React.createClass({
       linkName: {
         content: '核心链路'
       },
-      feature: {
-        content: '功能点'
-      },
-      URL: {
-        content: 'URL'
-      },
       QPS: {
         content: 'QPS'
       },
@@ -47,7 +48,7 @@ module.exports = React.createClass({
         content: 'RT'
       }
     };
-    let colOrder = ['linkName', 'feature', 'URL', 'QPS', 'trend', 'RT'];
+    let colOrder = ['linkName', 'QPS', 'trend', 'RT'];
 
     return (
         <Table
