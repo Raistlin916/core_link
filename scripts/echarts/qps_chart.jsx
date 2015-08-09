@@ -37,10 +37,6 @@ module.exports = React.createClass({
     return (
       <div>
         <Echarts config={config} />
-        <Echarts config={config} />
-        <Echarts config={config} />
-        <Echarts config={config} />
-        <Echarts config={config} />
       </div>
     );
   }
