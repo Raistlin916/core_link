@@ -1,6 +1,6 @@
 var React = require('react');
 var echarts = require('echarts');
-require('echarts/chart/bar');
+
 
 var Echarts = React.createClass({
     renderChart: function () {
@@ -30,8 +30,8 @@ var Echarts = React.createClass({
     },
 
     render: function () {
-      var height = {height: '200px', width: '200px', display: 'inline-block'};
-      return <div ref="chart" style={height} />
+      var style = {height: '400px', width: '800px'};
+      return <div ref="chart" style={style} />
     }
 });
 module.exports = Echarts;

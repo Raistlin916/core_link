@@ -1,34 +1,34 @@
 var React = require('react');
 var Echarts = require('./echarts');
+require('echarts/chart/line');
 
 var config = {
-  tooltip: {
-      show: true
+  tooltip : {
+    trigger: 'axis'
+  },
+  legend: {
+    data:['一天']
   },
   xAxis : [
-      {
-          type : 'category',
-          data : ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-      }
+    {
+      type : 'category',
+      boundaryGap : false,
+      data : ['周一','周二','周三','周四','周五','周六','周日']
+    }
   ],
   yAxis : [
-      {
-          type : 'value'
-      }
+    {
+      type : 'value'
+    }
   ],
   series : [
-      {
-          "name":"销量",
-          "type":"bar",
-          "data":[5, 20, 40, 10, 10, 20]
-      }
-  ],
-  grid: {
-    x: 25,
-    y: 25,
-    x2: 25,
-    y2: 25
-  }
+    {
+      name:'一天',
+      type:'line',
+      stack: '总量',
+      data:[120, 132, 101, 134, 90, 230, 210]
+    }
+  ]
 };
 
 
