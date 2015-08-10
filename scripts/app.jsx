@@ -5,8 +5,7 @@ let mui = require('material-ui');
 let ThemeManager = new mui.Styles.ThemeManager();
 let AppBar = mui.AppBar;
 let RouteHandler = Router.RouteHandler;
-let injectTapEventPlugin = require('react-tap-event-plugin');
-injectTapEventPlugin();
+let Link = require('react-router').Link;
 
 
 let App = React.createClass({
@@ -21,10 +20,13 @@ let App = React.createClass({
     };
   },
   render: function () {
-
+    var contentStyle = {
+      'fontFamily': "PingHei, STHeitiSC-Light, 'Helvetica Neue', Helvetica, Arial, sans-serif"
+    };
     return (
-      <div>
-        <AppBar title="核心链路数据监控" />
+      <div style={contentStyle}>
+        <AppBar title="核心链路数据监控"/>
+        
         <div style={{width: '1000px', margin: '40px auto'}}>
           <RouteHandler></RouteHandler>
         </div>
