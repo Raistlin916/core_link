@@ -25,7 +25,7 @@ let App = React.createClass({
     };
     return (
       <div style={contentStyle}>
-        <AppBar title="核心链路数据监控"/>
+        <AppBar title="核心链路数据监控" />
         
         <div style={{width: '1000px', margin: '40px auto'}}>
           <RouteHandler></RouteHandler>

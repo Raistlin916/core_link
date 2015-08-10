@@ -5,21 +5,14 @@ let TextField = mui.TextField;
 let ButtonSelects = require('./button_selects');
 let QPSChart = require('../echarts/qps_chart');
 
-let menuItems = [
-   { payload: '1', text: 'Never' },
-   { payload: '2', text: 'Every Night' },
-   { payload: '3', text: 'Weeknights' },
-   { payload: '4', text: 'Weekends' },
-   { payload: '5', text: 'Weekly' },
-];
-
 
 
 let DetailChart = React.createClass({
   getInitialState: function () {
     return {
       dataRangeSelectIndex: null,
-      contrastSelectIndex: null
+      contrastSelectIndex: null,
+      pageIndex: 0
     }
   },
 
@@ -38,16 +31,30 @@ let DetailChart = React.createClass({
       {id: 2, label: '一月前'},
       {id: 3, label: '三月前'}
     ];
+    let pages = [
+      { payload: '1', text: '支付页（收银台）' },
+      { payload: '2', text: '支付跳转' },
+      { payload: '3', text: '订单确认' },
+      { payload: '4', text: '报存地址' },
+      { payload: '5', text: '到店自提list' },
+      { payload: '6', text: '到店自提book' },
+      { payload: '7', text: '支付操作' },
+    ];
+
 
     contrastItems.forEach(function (item, i) {
       item.disabled = this.state.dataRangeSelectIndex != 0;
     }.bind(this));
 
+    let dateRange = dateRangeItems[this.state.dataRangeSelectIndex];
+    let contrastItem = contrastItems[this.state.contrastSelectIndex];
+    let page = pages[this.state.pageIndex];
+
     return (
       <div>
         <div style={rowStyle}>
           <label>监控页面选择：</label>
-          <DropDownMenu menuItems={menuItems} />
+          <DropDownMenu menuItems={pages} onChange={this.handlePageChange} />
           <div style={{display: 'inline-block'}}>
             <ButtonSelects items={dateRangeItems} onChange={this.handleDateRangeChange}/>
           </div>
@@ -77,6 +84,12 @@ let DetailChart = React.createClass({
   handleContrastItemChange: function (item, index) {
     this.setState({
       contrastSelectIndex: index
+    });
+  },
+
+  handlePageChange: function (elem, index, item) {
+    this.setState({
+      pageIndex: index
     });
   }
 });
