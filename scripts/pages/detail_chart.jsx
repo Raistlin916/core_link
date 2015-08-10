@@ -2,6 +2,9 @@ let React = require('react');
 let mui = require('material-ui');
 let DropDownMenu = mui.DropDownMenu;
 let TextField = mui.TextField;
+let injectTapEventPlugin = require("react-tap-event-plugin");
+
+injectTapEventPlugin();
 
 let menuItems = [
    { payload: '1', text: 'Never' },

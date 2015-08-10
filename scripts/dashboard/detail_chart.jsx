@@ -12,7 +12,6 @@ var TextField = _require.TextField;
 var StyleResizable = Mixins.StyleResizable;
 
 var TextFieldsPage = React.createClass({
-  displayName: 'TextFieldsPage',
 
   mixins: [StyleResizable, React.addons.LinkedStateMixin],
 
