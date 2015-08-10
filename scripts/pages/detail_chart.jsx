@@ -17,26 +17,31 @@ let menuItems = [
 
 let DetailChart = React.createClass({
   getInitialState: function () {
-    var dateRangeItems = [
+    return {
+      dataRangeSelectIndex: null,
+      contrastSelectIndex: null
+    }
+  },
+
+  render: function () {
+    let rowStyle = {margin: '40px auto'};
+
+    let dateRangeItems = [
       {id: 0, label: '一天'},
       {id: 1, label: '一周'},
       {id: 2, label: '一月'},
       {id: 3, label: '三月'}
     ];
-    var contrastItems = [
+    let contrastItems = [
       {id: 0, label: '一天前'},
       {id: 1, label: '一周前'},
       {id: 2, label: '一月前'},
       {id: 3, label: '三月前'}
     ];
-    return {
-      dateRangeItems: dateRangeItems,
-      contrastItems: contrastItems
-    }
-  },
 
-  render: function () {
-    var rowStyle = {margin: '40px auto'};
+    contrastItems.forEach(function (item, i) {
+      item.disabled = this.state.dataRangeSelectIndex != 0;
+    }.bind(this));
 
     return (
       <div>
@@ -44,12 +49,12 @@ let DetailChart = React.createClass({
           <label>监控页面选择：</label>
           <DropDownMenu menuItems={menuItems} />
           <div style={{display: 'inline-block'}}>
-            <ButtonSelects items={this.state.dateRangeItems} onChange={this.handleDateRangeChange}/>
+            <ButtonSelects items={dateRangeItems} onChange={this.handleDateRangeChange}/>
           </div>
         </div>
         <div style={rowStyle}>
           <label>对比数据选择：</label>
-          <ButtonSelects items={this.state.contrastItems} onChange={this.handleContrastItemChange}/>
+          <ButtonSelects items={contrastItems} onChange={this.handleContrastItemChange}/>
         </div>
         <div style={rowStyle}>
           <label>QPS趋势图：</label>
@@ -63,28 +68,16 @@ let DetailChart = React.createClass({
     )
   },
 
-  handleContrastItemChange: function (item, index) {
-
+  handleDateRangeChange: function (item, index) {
+    this.setState({
+      dataRangeSelectIndex: index
+    });
   },
 
-  handleDateRangeChange: function (item, index) {
-    if (index == 0) {
-      this.setState({
-        contrastItems: this.state.contrastItems.map(function (item, i) {
-          item.disabled = false;
-          //item.isChecked = index == i;
-          return item;
-        })
-      });
-    } else {
-      this.setState({
-        contrastItems: this.state.contrastItems.map(function (item, i) {
-          item.disabled = i != 0;
-          //item.isChecked = i == 0;
-          return item;
-        })
-      });
-    }
+  handleContrastItemChange: function (item, index) {
+    this.setState({
+      contrastSelectIndex: index
+    });
   }
 });
 

@@ -7,10 +7,27 @@ let Link = require('react-router').Link;
 module.exports = React.createClass({
   render: function () {
     let rowData = [
-      {linkName: {content: <Link to="detail" params={{id: '1'}}>注册</Link>}
-        , feature: {content: '支付'}, URL: {content: 'http://trade.koudaitong.com/wxpay/confirm'}, QPS: {content: 1000}, trend: {content: '5%'}, RT: {content:'0.5'} },
-      {linkName: {content: <Link to="detail" params={{id: '2'}}>下单</Link>}
-        , feature: {content: '支付'}, URL: {content: 'http://trade.koudaitong.com/wxpay/confirm'}, QPS: {content: 1000}, trend: {content: '5%'}, RT: {content:'0.5'} }
+      {linkName: {content: <Link to="detail" params={{id: 'wxpay_confirm'}}>下单</Link>}
+        , feature: {content: '支付页（收银台）'}, URL: {content: 'http://trade.koudaitong.com/wxpay/confirm'}
+        , QPS: {content: 1000}, trend: {content: '5%'}, RT: {content:'0.5'} },
+      {linkName: {content: <Link to="detail" params={{id: 'confirm_index'}}>下单</Link>}
+        , feature: {content: '支付跳转'}, URL: {content: 'http://trade.koudaitong.com/v2/trade/confirm/index'}
+      },
+      {linkName: {content: <Link to="detail" params={{id: 'order_confirm'}}>下单</Link>}
+        , feature: {content: '订单确认'}, URL: {content: 'http://trade.koudaitong.com/v2/trade/order/confirm'}
+      },
+      {linkName: {content: <Link to="detail" params={{id: 'save_address'}}>物流</Link>}
+        , feature: {content: '报存地址'}, URL: {content: 'http://trade.koudaitong.com/trade/order/address.json'}
+      },
+      {linkName: {content: <Link to="detail" params={{id: 'selffetch_list'}}>物流</Link>}
+        , feature: {content: '到店自提list'}, URL: {content: 'http://trade.koudaitong.com/v2/trade/selffetch/list.json'}
+      },
+      {linkName: {content: <Link to="detail" params={{id: 'selffetch_book'}}>物流</Link>}
+        , feature: {content: '到店自提book'}, URL: {content: 'http://trade.koudaitong.com/v2/trade/selffetch/book.json'}
+      },
+      {linkName: {content: <Link to="detail" params={{id: 'order_pay'}}>支付</Link>}
+        , feature: {content: '支付操作'}, URL: {content: 'http://trade.koudaitong.com/trade/order/pay.json'}
+      }
     ];
 
     hack.wrapNum(rowData);
