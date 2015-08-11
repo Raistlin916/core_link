@@ -18,10 +18,12 @@ var NavigationClose = React.createClass({
 
   render: function () {
     var contentStyle = {
-      backgroundImage:'url(http://dn-kdt-static.qbox.me/v2/image/intro/logo@2x.png)',
-      height:'24px',
-      width: '60px',
-      backgroundSize: 'cover'
+      backgroundImage:'url(./images/logo@2x.png)',
+      height: '35px',
+      width: '30px',
+      backgroundSize: 'cover',
+      position: 'relative',
+      top: '-5px'
     };
     return (
      <div style={contentStyle}></div>
