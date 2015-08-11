@@ -4,13 +4,12 @@ let DropDownMenu = mui.DropDownMenu;
 let TextField = mui.TextField;
 let ButtonSelects = require('./button_selects');
 let QPSChart = require('../echarts/qps_chart');
-
-
+let RTChart = require('../echarts/rt_chart');
 
 let DetailChart = React.createClass({
   getInitialState: function () {
     return {
-      dataRangeSelectIndex: null,
+      dateRangeSelectIndex: null,
       contrastSelectIndex: null,
       pageIndex: 0
     }
@@ -43,10 +42,10 @@ let DetailChart = React.createClass({
 
 
     contrastItems.forEach(function (item, i) {
-      item.disabled = this.state.dataRangeSelectIndex != 0;
+      item.disabled = this.state.dateRangeSelectIndex != 0;
     }.bind(this));
 
-    let dateRange = dateRangeItems[this.state.dataRangeSelectIndex];
+    let dateRange = dateRangeItems[this.state.dateRangeSelectIndex];
     let contrastItem = contrastItems[this.state.contrastSelectIndex];
     let page = pages[this.state.pageIndex];
 
@@ -65,11 +64,11 @@ let DetailChart = React.createClass({
         </div>
         <div style={rowStyle}>
           <label>QPS趋势图：</label>
-          <QPSChart />
+          <QPSChart {...this.state}/>
         </div>
         <div style={rowStyle}>
           <label>RT趋势图</label>
-          <QPSChart />
+          <RTChart {...this.state}/>
         </div>
       </div>
     )
@@ -77,7 +76,7 @@ let DetailChart = React.createClass({
 
   handleDateRangeChange: function (item, index) {
     this.setState({
-      dataRangeSelectIndex: index
+      dateRangeSelectIndex: index
     });
   },
 

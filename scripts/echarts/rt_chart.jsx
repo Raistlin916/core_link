@@ -4,23 +4,6 @@ let Echarts = require('./echarts');
 require('echarts/chart/line');
 require('echarts/chart/bar');
 
-
-// let requestOption = JSON.stringify({
-//   business: 'youzan_core_service',
-//   stime: (new Date - 1000*24*60*60)/1000,
-//   etime: (new Date)/1000,
-//   metrics: 'qpm'
-// });
-
-// request.get('http://192.168.66.240:8188/monitor/pull.php')
-//   .send({
-//     query: requestOption
-//   })
-//   .then(function (res) {
-//     let data = JSON.parse(res.text);
-//     console.log(data);
-//   });
-
 module.exports = React.createClass({
   getInitialState: function () {
     return {
@@ -95,10 +78,8 @@ module.exports = React.createClass({
   },
 
   componentDidMount: function () {
-    this.updateChart();
-  },
-
-  componentWillReceiveProps: function () {
-    this.updateChart();
+    setTimeout(function () {
+      this.updateChart();
+    }.bind(this), 1000);
   }
 });

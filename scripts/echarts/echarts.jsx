@@ -25,6 +25,10 @@ var Echarts = React.createClass({
         myChart.setOption(config);
     },
 
+    componentDidUpdate: function () {
+      this.renderChart();
+    },
+
     componentDidMount: function () {
       this.renderChart();
     },
