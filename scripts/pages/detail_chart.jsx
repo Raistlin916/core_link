@@ -5,11 +5,12 @@ let TextField = mui.TextField;
 let ButtonSelects = require('./button_selects');
 let QPSChart = require('../echarts/qps_chart');
 let RTChart = require('../echarts/rt_chart');
+let pagesData = require('../config').pages;
 
 let DetailChart = React.createClass({
   getInitialState: function () {
     return {
-      dateRangeSelectIndex: null,
+      dateRangeSelectIndex: 0,
       contrastSelectIndex: null,
       pageIndex: 0
     }
@@ -19,26 +20,23 @@ let DetailChart = React.createClass({
     let rowStyle = {margin: '40px auto'};
 
     let dateRangeItems = [
-      {id: 0, label: '一天'},
-      {id: 1, label: '一周'},
-      {id: 2, label: '一月'},
-      {id: 3, label: '三月'}
+      {label: '一天'},
+      {label: '一周'},
+      {label: '一月'},
+      {label: '三月'}
     ];
     let contrastItems = [
-      {id: 0, label: '一天前'},
-      {id: 1, label: '一周前'},
-      {id: 2, label: '一月前'},
-      {id: 3, label: '三月前'}
+      {label: '一天前'},
+      {label: '一周前'},
+      {label: '一月前'},
+      {label: '三月前'}
     ];
-    let pages = [
-      { payload: '1', text: '支付页（收银台）' },
-      { payload: '2', text: '支付跳转' },
-      { payload: '3', text: '订单确认' },
-      { payload: '4', text: '报存地址' },
-      { payload: '5', text: '到店自提list' },
-      { payload: '6', text: '到店自提book' },
-      { payload: '7', text: '支付操作' },
-    ];
+    let pages = pagesData.map(function (item) {
+      return {
+        payload: item.id,
+        text: item.name
+      }
+    });
 
 
     contrastItems.forEach(function (item, i) {
@@ -48,6 +46,9 @@ let DetailChart = React.createClass({
     let dateRange = dateRangeItems[this.state.dateRangeSelectIndex];
     let contrastItem = contrastItems[this.state.contrastSelectIndex];
     let page = pages[this.state.pageIndex];
+
+    dateRange && (dateRange.isChecked = true);
+    contrastItem && (contrastItem.isChecked = true);
 
     return (
       <div>
@@ -76,7 +77,8 @@ let DetailChart = React.createClass({
 
   handleDateRangeChange: function (item, index) {
     this.setState({
-      dateRangeSelectIndex: index
+      dateRangeSelectIndex: index,
+      contrastSelectIndex: index == 0 ? this.state.contrastSelectIndex : null
     });
   },
 

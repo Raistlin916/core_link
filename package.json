@@ -2,7 +2,7 @@
   "scripts": {
     "start": "npm run serve | npm run dev",
     "serve": "./node_modules/.bin/http-server -p 8080",
-    "dev": "webpack-dev-server --progress --colors --port 8090"
+    "dev": "webpack-dev-server --progress --colors --port 8091"
   },
   "name": "program",
   "version": "0.1.0",
@@ -17,6 +17,7 @@
   "dependencies": {
     "http-server": "^0.8.0",
     "material-ui": "^0.10.2",
+    "moment": "^2.10.6",
     "normalize.css": "^3.0.3",
     "react": "^0.13.3",
     "react-router": "^0.13.3",
