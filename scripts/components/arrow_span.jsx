@@ -6,14 +6,14 @@ let ArrowSpan = React.createClass({
     if(!isNaN(value)){
         if(value < 0){
             addClass = {
-              color: '#c10000',
+              color: '#03b401',
               paddingRight: '12px'
             };
             arrow = '↓';
             value += arrow;
         }else{
             addClass = {
-              color: '#03b401',
+              color: '#c10000',
               paddingRight: '12px'
             };
             arrow = '↑';
