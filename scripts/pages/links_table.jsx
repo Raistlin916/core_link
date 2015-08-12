@@ -46,6 +46,34 @@ let tableConfig = {
   height: '600px',
 };
 
+var ArrowSpan = React.createClass({
+  render: function() {
+    var value = this.props.data,
+        addClass = null,
+        arrow = null;
+    if(!isNaN(value)){
+        if(value < 0){
+            addClass = {
+              color: '#c10000',
+              paddingRight: '12px'
+            };
+            arrow = '↓';
+            value += arrow;
+        }else{
+            addClass = {
+              color: '#03b401',
+              paddingRight: '12px'
+            };
+            arrow = '↑';
+            value += arrow;
+        }
+    }
+    return (
+     <span style={addClass}>{value}</span>
+    )
+  }  
+});
+
 
 module.exports = React.createClass({
   getInitialState: function () {
@@ -103,11 +131,13 @@ module.exports = React.createClass({
     hack.wrapNum(rowData);
 
     return (
+      <div>
         <Table
         headerColumns={headerCols}
         columnOrder={colOrder}
         rowData={rowData}
         {...tableConfig} />
+      </div>
       )
   },
 
