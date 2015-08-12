@@ -16,6 +16,10 @@ var NavigationClose = React.createClass({
 
   mixins: [PureRenderMixin],
 
+  goIndex: function() {
+      window.location.hash = '';
+  },
+
   render: function () {
     var contentStyle = {
       backgroundImage:'url(./images/logo@2x.png)',
@@ -25,8 +29,9 @@ var NavigationClose = React.createClass({
       position: 'relative',
       top: '-5px'
     };
+
     return (
-     <div style={contentStyle}></div>
+     <div style={contentStyle} onClick={this.goIndex}></div>
     )
   }
 
