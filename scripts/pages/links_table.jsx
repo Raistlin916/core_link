@@ -13,6 +13,8 @@ module.exports = React.createClass({
         return {
           core: item.core,
           feature: item.name,
+          service: item.service,
+          method: item.method,
           URL: item.url,
           QPS: null,
           QPStrend: null,
@@ -23,7 +25,7 @@ module.exports = React.createClass({
     }
   },
   render: function () {
-    let rowData = this.state.rowData;
+    let rowData = JSON.parse(JSON.stringify(this.state.rowData));
 
     rowData.forEach(function (item) {
       Object.keys(item).forEach(function (k) {
@@ -32,9 +34,23 @@ module.exports = React.createClass({
             content: <Link to="detail" params={{id: 'chart'}}>{item[k]}</Link>
           };
         } else {
-          item[k] = {
-            content: item[k]
-          };
+          if (k == 'QPS' || k == 'RT') {
+            item[k] = {
+              content: item[k] == null ? <span>null</span> : item[k]
+            };
+          } else if(k == 'URL') {
+            item[k] = {
+              content: item[k],
+              style: {
+                width: '200px'
+              }
+            };
+          } else {
+            item[k] = {
+              content: item[k]
+            };
+          }
+          
         }
       });
      
@@ -42,8 +58,7 @@ module.exports = React.createClass({
 
     hack.wrapNum(rowData);
 
-    // State
-    this.state = {
+    let data = {
       fixedHeader: true,
       stripedRows: false,
       showRowHover: true,
@@ -65,7 +80,10 @@ module.exports = React.createClass({
         content: '功能点'
       },
       URL: {
-        content: 'URL'
+        content: 'URL',
+        style: {
+          width: '200px'
+        }
       },
       QPS: {
         content: 'QPS'
@@ -86,24 +104,55 @@ module.exports = React.createClass({
         <Table
         headerColumns={headerCols}
         columnOrder={colOrder}
-        {...this.state} />
+        {...data} />
       )
   },
 
   componentDidMount: function () {
-    // var time = parseInt((new Date)/1000);
-    // let requestOption = {
-    //   business: 'youzan_core_service',
-    //   stime: time,
-    //   etime: time,
-    //   aggregator: 'sum',
-    //   metrics: ["qpm"],
-    //   tags:{service: service, method: method}
-    // };
+    setInterval(function () {
+      this.updateAllRow();
+    }.bind(this), 1000 * 60);
 
-    // let p = $.get(apiAddress + '/monitor/pull',
-    //   {
-    //     query: JSON.stringify(requestOption)
-    //   });
+    this.updateAllRow();
+  },
+
+  updateAllRow: function () {
+    this.state.rowData.forEach(function (item, index) {
+      this.fetchItemData(item.service, item.method, index);
+    }.bind(this));
+  },
+
+  fetchItemData: function (service, method, index) {
+    var time = parseInt((new Date)/1000);
+
+    let requestOption = {
+      business: 'youzan_core_service',
+      stime: time - 120,
+      etime: time - 60,
+      aggregator: 'sum',
+      metrics: ['qpm', 'rt'],
+      tags:{service: service, method: method}
+    };
+
+    $.get(apiAddress + '/monitor/pull',
+      {
+        query: JSON.stringify(requestOption)
+      })
+    .then(function (res) {
+      let result = res.result;
+      let rowData = this.state.rowData;
+      let rowItemData = rowData[index];
+
+      try {
+        rowData[index].QPS = parseInt(result[0].dps[Object.keys(result[0].dps)[0]]/60);
+        rowData[index].RT = parseInt(result[1].dps[Object.keys(result[1].dps)[0]]);
+        this.setState({
+          rowData: rowData
+        });
+      } catch(e) {
+        console.error(e);
+      }
+      
+    }.bind(this));
   }
 });
