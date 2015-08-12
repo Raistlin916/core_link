@@ -43925,16 +43925,26 @@
 	      query: JSON.stringify(requestOption)
 	    });
 
+	    function caculAverage(dps) {
+	      var sum = 0;
+	      var ks = Object.keys(dps);
+	      ks.forEach(function (k) {
+	        sum += dps[k];
+	      });
+	      return sum / ks.length;
+	    }
+
 	    $.when(p1, p2).then((function (res1, res2) {
 	      var result1 = res1[0].result;
 	      var result2 = res2[0].result;
 	      var rowData = this.state.rowData;
 	      var rowItemData = rowData[index];
+
 	      try {
-	        rowData[index].QPS = parseInt(result1[0].dps[Object.keys(result1[0].dps)[0]] / 60);
-	        rowData[index].RT = parseInt(result1[1].dps[Object.keys(result1[1].dps)[0]]);
-	        rowData[index].QPScontrast = parseInt(result2[0].dps[Object.keys(result2[0].dps)[0]] / 60);
-	        rowData[index].RTcontrast = parseInt(result2[1].dps[Object.keys(result2[1].dps)[0]]);
+	        rowData[index].QPS = parseInt(caculAverage(result1[0].dps) / 60);
+	        rowData[index].RT = parseInt(caculAverage(result1[1].dps));
+	        rowData[index].QPScontrast = parseInt(caculAverage(result2[0].dps) / 60);
+	        rowData[index].RTcontrast = parseInt(caculAverage(result2[1].dps));
 	        this.setState({
 	          rowData: rowData
 	        });
@@ -43954,197 +43964,138 @@
 	module.exports = {
 	  apiAddress: 'http://api.hawk.qima-inc.com/',
 	  pages: [ { id: '1',
+	    serviceName: '商品',
+	    service: 'goods',
 	    core: '下单',
+	    method: 'show_goods',
+	    url: 'detail.koudaitong.com/show/goods',
+	    name: '商品详情页' },
+	  { id: '2',
+	    serviceName: '下单',
 	    service: 'order',
+	    core: '下单',
 	    method: 'wxpay_confirm',
 	    url: 'trade.koudaitong.com/wxpay/confirm',
 	    name: '支付页(收银台)' },
-	  { id: '2',
-	    core: '下单',
-	    service: 'order',
-	    method: 'confirm_index',
-	    url: 'trade.koudaitong.com/v2/trade/confirm/index',
-	    name: '支付跳转' },
 	  { id: '3',
-	    core: '下单',
-	    service: 'order',
-	    method: 'order_confirm',
-	    url: 'trade.koudaitong.com/v2/trade/order/confirm',
-	    name: '订单确认' },
-	  { id: '4',
-	    core: '下单',
+	    serviceName: '物流',
 	    service: 'expreess',
+	    core: '下单',
 	    method: 'save_address',
 	    url: 'trade.koudaitong.com/trade/order/address.json',
 	    name: '保存地址' },
-	  { id: '5',
-	    core: '下单',
+	  { id: '4',
+	    serviceName: '物流',
 	    service: 'expreess',
+	    core: '下单',
 	    method: 'selffetch_list',
 	    url: 'trade.koudaitong.com/v2/trade/selffetch/list.json',
 	    name: '到店自提list' },
-	  { id: '6',
-	    core: '下单',
+	  { id: '5',
+	    serviceName: '物流',
 	    service: 'expreess',
+	    core: '下单',
 	    method: 'selffetch_book',
 	    url: 'trade.koudaitong.com/v2/trade/selffetch/book.json',
 	    name: '到店自提book' },
-	  { id: '7',
-	    core: '下单',
+	  { id: '6',
+	    serviceName: '支付',
 	    service: 'pay',
+	    core: '下单',
 	    method: 'order_pay',
 	    url: 'trade.koudaitong.com/trade/order/pay.json',
 	    name: '支付操作' },
-	  { id: '8',
-	    core: '下单',
+	  { id: '7',
+	    serviceName: '支付',
 	    service: 'pay',
+	    core: '下单',
 	    method: 'umpay_card',
 	    url: 'trade.koudaitong.com/pay/umpay/cards',
 	    name: '信用卡绑定' },
-	  { id: '9',
-	    core: '下单',
+	  { id: '8',
+	    serviceName: '支付',
 	    service: 'pay',
+	    core: '下单',
 	    method: 'umpay_pay',
 	    url: 'trade.koudaitong.com/pay/umpay/confirm',
 	    name: '信用卡支付' },
-	  { id: '10',
-	    core: '下单',
+	  { id: '9',
+	    serviceName: '支付',
 	    service: 'pay',
+	    core: '下单',
 	    method: 'umpay_agreeconfirm',
 	    url: 'trade.koudaitong.com/pay/umpay/agreeConfirm.json',
 	    name: '绑定确认' },
-	  { id: '11',
-	    core: '下单',
+	  { id: '10',
+	    serviceName: '支付',
 	    service: 'pay',
+	    core: '下单',
 	    method: 'pay_baiduwap',
 	    url: 'trade.koudaitong.com/pay/baiduwap/redirect',
 	    name: '储蓄卡支付' },
-	  { id: '12',
-	    core: '下单',
+	  { id: '11',
+	    serviceName: '交易结果页',
 	    service: 'order_result',
+	    core: '下单',
 	    method: 'baiduwap_return',
 	    url: 'trade.koudaitong.com/pay/baiduwap/return',
 	    name: '储蓄卡支付完成' },
-	  { id: '13',
-	    core: '下单',
+	  { id: '12',
+	    serviceName: '交易结果页',
 	    service: 'order_result',
+	    core: '下单',
 	    method: 'order_complete',
 	    url: 'trade.koudaitong.com/trade/order/paid',
 	    name: '支付成功/失败中间页' },
-	  { id: '14',
-	    core: '下单',
+	  { id: '13',
+	    serviceName: '交易结果页',
 	    service: 'order_result',
+	    core: '下单',
 	    method: 'confirm',
 	    url: 'trade.koudaitong.com/confirm',
 	    name: '结果页' },
-	  { id: '15',
-	    core: '下单',
+	  { id: '14',
+	    serviceName: '交易结果页',
 	    service: 'order_result',
+	    core: '下单',
 	    method: 'order_result',
-	    url: 'wap.koudaitong.com/v2/trade/order/result',
+	    url: 'trade.koudaitong.com/trade/order/result',
 	    name: '订单详情页' },
-	  { id: '16',
-	    core: '下单',
+	  { id: '15',
+	    serviceName: '交易结果页',
 	    service: 'order_result',
+	    core: '下单',
 	    method: 'order_express',
-	    url: 'wap.koudaitong.com/v2/trade/order/orderExpress.json',
+	    url: 'trade.koudaitong.com/v2/trade/order/orderExpress.json',
 	    name: '获取物流信息' },
-	  { id: '17',
-	    core: '注册',
-	    service: 'sign_up',
-	    method: 'account',
-	    url: 'koudaitong.com/v2/account',
-	    name: '注册（卖家）' },
-	  { id: '18',
-	    core: '注册',
-	    service: 'sign_up',
-	    method: 'smsg',
-	    url: 'koudaitong.com/v2/common/smsg/captcha.json',
-	    name: '短信验证码' },
-	  { id: '19',
-	    core: '注册',
+	  { id: '16',
+	    serviceName: '登录',
 	    service: 'login',
-	    method: 'company',
-	    url: 'koudaitong.com/v2/account/company/company.json',
-	    name: '获取公司信息' },
-	  { id: '20',
-	    core: '注册',
-	    service: 'login',
-	    method: 'team_solution',
-	    url: 'koudaitong.com/v2/account/team/solution',
-	    name: '选择推荐模板' },
-	  { id: '21',
-	    core: '注册',
-	    service: 'login',
-	    method: 'team_choose',
-	    url: 'koudaitong.com/v2/account/team/choose.json',
-	    name: '确认模板' },
-	  { id: '22',
-	    core: '注册',
-	    service: 'login',
-	    method: 'weixinbind',
-	    url: 'koudaitong.com/v2/account/auth/weixinbind',
-	    name: '微信绑定' },
-	  { id: '23',
-	    core: '注册',
-	    service: 'login',
-	    method: 'weixin_redirect',
-	    url: 'koudaitong.com/v2/weixin/component/redirecturi.json',
-	    name: '微信跳转' },
-	  { id: '24',
-	    core: '注册',
-	    service: 'login',
-	    method: 'url_create',
-	    url: 'wap.koudaitong.com/v2/common/url/create',
-	    name: '创建完成' },
-	  { id: '25',
 	    core: '登录',
-	    service: 'login',
 	    method: 'user_login',
-	    url: 'koudaitong.com/v2/account/user/login',
+	    url: 'koudaitong.com/account/user/login',
 	    name: '登录（卖家）' },
-	  { id: '26',
-	    core: '登录',
+	  { id: '17',
+	    serviceName: '登录',
 	    service: 'login',
+	    core: '登录',
 	    method: 'sso_login',
 	    url: 'login.youzan.com/sso/index/login.json',
 	    name: '登录' },
-	  { id: '27',
-	    core: '登录',
+	  { id: '18',
+	    serviceName: 'wap登录',
 	    service: 'wap_login',
+	    core: '登录',
 	    method: 'auth_confirm',
 	    url: 'trade.koudaitong.com/v2/buyer/auth/authConfirm.json',
 	    name: '判断注册（买家）' },
-	  { id: '28',
-	    core: '登录',
+	  { id: '19',
+	    serviceName: 'wap登录',
 	    service: 'wap_login',
+	    core: '登录',
 	    method: 'auth_login',
 	    url: 'wap.koudaitong.com/v2/buyer/auth/authlogin.json',
-	    name: '进行登录（买家）' },
-	  { id: '29',
-	    core: '微小店选货市场',
-	    service: 'fenxiao',
-	    method: 'fenxiao_active_list',
-	    url: 'wap.koudaitong.com/v2/fenxiao/active/list',
-	    name: '商品市场活动列表页' },
-	  { id: '30',
-	    core: '微小店选货市场',
-	    service: 'fenxiao',
-	    method: 'fenxiao_goods',
-	    url: 'wap.koudaitong.com/v2/showcase_fenxiao/goods',
-	    name: '非活动商品详情页' },
-	  { id: '31',
-	    core: '微小店选货市场',
-	    service: 'fenxiao',
-	    method: 'fenxiao_goods_active',
-	    url: 'wap.koudaitong.com/v2/showcase_fenxiao/goods/active',
-	    name: '活动商品详情页' },
-	  { id: '32',
-	    core: '微小店选货市场',
-	    service: 'fenxiao',
-	    method: 'fenxiao_goods_create',
-	    url: 'koudaitong.com/fenxiao/goods/create.json',
-	    name: '活动商品添加到店铺' } ]
+	    name: '进行登录（买家）' } ]
 	};
 
 /***/ },
@@ -44166,10 +44117,16 @@
 	// Column configuration
 	var headerCols = {
 	  core: {
-	    content: '核心链路'
+	    content: '核心链路',
+	    style: {
+	      width: '50px'
+	    }
 	  },
 	  feature: {
-	    content: '功能点'
+	    content: '功能点',
+	    style: {
+	      width: '150px'
+	    }
 	  },
 	  URL: {
 	    content: 'URL',
@@ -44222,34 +44179,42 @@
 	              Link,
 	              { to: 'detail', params: { id: 'chart' } },
 	              item[k]
-	            )
+	            ),
+	            style: {
+	              width: '150px'
+	            }
+	          };
+	        } else if (k == 'QPS' || k == 'RT') {
+	          item[k] = {
+	            content: item[k] == null ? React.createElement(
+	              'span',
+	              null,
+	              'null'
+	            ) : item[k]
+	          };
+	        } else if (k == 'URL') {
+	          item[k] = {
+	            content: item[k],
+	            style: {
+	              width: '300px'
+	            }
+	          };
+	        } else if (k == 'QPStrend' || k == 'RTtrend') {
+	          item[k] = {
+	            content: React.createElement(ArrowSpan, { data: item[k] })
+	          };
+	        } else if (k == 'core') {
+	          item[k] = {
+	            content: item[k],
+	            style: {
+	              width: '50px'
+	            }
 	          };
 	        } else {
-	          if (k == 'QPS' || k == 'RT') {
-	            item[k] = {
-	              content: item[k] == null ? React.createElement(
-	                'span',
-	                null,
-	                'null'
-	              ) : item[k]
-	            };
-	          } else if (k == 'URL') {
-	            item[k] = {
-	              content: item[k],
-	              style: {
-	                width: '300px'
-	              }
-	            };
-	          } else if (k == 'QPStrend' || k == 'RTtrend') {
-	            item[k] = {
-	              content: React.createElement(ArrowSpan, { data: item[k] })
-	            };
-	          } else {
-	            item[k] = {
-	              content: item[k]
-	            };
+	          item[k] = {
+	            content: item[k]
 	          };
-	        }
+	        };
 	      });
 	    });
 
