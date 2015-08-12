@@ -124,7 +124,7 @@ module.exports = React.createClass({
         chartData.push({
           name: ['一天', '一周', '一月', '三月'][config.contrastSelectIndex] + '前',
           keys: kv2.keys.map(function (item) {
-            return moment(item*1000).format('MM-DD hh');
+            return moment(item*1000).format('MM-DD HH:mm');
           }),
           values: kv2.values.map(function(item){
             return item;

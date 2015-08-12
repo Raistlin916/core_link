@@ -52,9 +52,9 @@
 	var React = __webpack_require__(5);
 
 	var MainTable = __webpack_require__(354);
-	var LinksTable = __webpack_require__(356);
-	var DetailChart = __webpack_require__(358);
-	var injectTapEventPlugin = __webpack_require__(544);
+	var LinksTable = __webpack_require__(359);
+	var DetailChart = __webpack_require__(360);
+	var injectTapEventPlugin = __webpack_require__(546);
 	injectTapEventPlugin();
 
 	// declare our routes and their hierarchy
@@ -23579,6 +23579,10 @@
 
 	  mixins: [PureRenderMixin],
 
+	  goIndex: function goIndex() {
+	    window.location.hash = '';
+	  },
+
 	  render: function render() {
 	    var contentStyle = {
 	      backgroundImage: 'url(./images/logo@2x.png)',
@@ -23588,7 +23592,8 @@
 	      position: 'relative',
 	      top: '-5px'
 	    };
-	    return React.createElement('div', { style: contentStyle });
+
+	    return React.createElement('div', { style: contentStyle, onClick: this.goIndex });
 	  }
 
 	});
@@ -23615,7 +23620,7 @@
 	    };
 
 	    var mainStyle = {
-	      width: '1000px',
+	      width: '1200px',
 	      margin: '40px auto'
 	    };
 	    return React.createElement(
@@ -43682,74 +43687,102 @@
 	var Table = mui.Table;
 	var hack = __webpack_require__(355);
 	var Link = __webpack_require__(1).Link;
+	var ArrowSpan = __webpack_require__(356);
+	var TableMixin = __webpack_require__(357);
+
+	var tableConfig = {
+	  fixedHeader: true,
+	  stripedRows: false,
+	  showRowHover: true,
+	  selectable: true,
+	  multiSelectable: false,
+	  deselectOnClickaway: true,
+	  displayRowCheckbox: false,
+	  displaySelectAll: false,
+	  height: '600px'
+	};
+	var headerCols = {
+	  core: {
+	    content: '核心链路'
+	  },
+	  QPS: {
+	    content: 'QPS'
+	  },
+	  QPStrend: {
+	    content: '趋势'
+	  },
+	  RT: {
+	    content: 'RT'
+	  },
+	  RTtrend: {
+	    content: '趋势'
+	  }
+	};
+	var colOrder = ['core', 'QPS', 'QPStrend', 'RT', 'RTtrend'];
 
 	module.exports = React.createClass({
 	  displayName: 'exports',
 
+	  mixins: [TableMixin],
+
 	  render: function render() {
-	    var rowData = [{ linkName: { content: React.createElement(
-	          Link,
-	          { to: 'links', params: { name: 'all' } },
-	          '下单'
-	        ) },
-	      QPS: { content: '1500' }, trend: { content: '5%' }, RT: { content: '0.3' } }, { linkName: { content: React.createElement(
-	          Link,
-	          { to: 'links', params: { name: 'all' } },
-	          '注册'
-	        ) },
-	      QPS: { content: '1000' }, trend: { content: '10%' }, RT: { content: '0.5' } }, { linkName: { content: React.createElement(
-	          Link,
-	          { to: 'links', params: { name: 'all' } },
-	          '登录'
-	        ) },
-	      QPS: { content: '1200' }, trend: { content: '5%' }, RT: { content: '0.4' } }, { linkName: { content: React.createElement(
-	          Link,
-	          { to: 'links', params: { name: 'all' } },
-	          '微小店选货市场'
-	        ) },
-	      QPS: { content: '1500' }, trend: { content: '5%' }, RT: { content: '0.3' } }];
+	    var rowData = JSON.parse(JSON.stringify(this.state.rowData));
+
+	    var rowData1 = rowData.filter(function (item) {
+	      return item.core == '下单';
+	    });
+
+	    var rowData2 = rowData.filter(function (item) {
+	      return item.core == '登录';
+	    });
+
+	    rowData = [rowData1, rowData2].map(function (item) {
+	      return item.reduce(function (a, b) {
+	        return a.QPS == Math.max(a.QPS, b.QPS) ? a : b;
+	      });
+	    });
+
+	    rowData.forEach(function (item) {
+	      item.QPStrend = ((1 - item.QPScontrast / item.QPS) * 100).toFixed(2);
+	      item.RTtrend = ((1 - item.RTcontrast / item.RT) * 100).toFixed(2);
+
+	      Object.keys(item).forEach(function (k) {
+	        if (k == 'core') {
+	          item[k] = {
+	            content: React.createElement(
+	              Link,
+	              { to: 'links', params: { name: 'all' } },
+	              item[k]
+	            )
+	          };
+	        } else if (k == 'QPS' || k == 'RT') {
+	          item[k] = {
+	            content: item[k] == null ? React.createElement(
+	              'span',
+	              null,
+	              'null'
+	            ) : item[k]
+	          };
+	        } else if (k == 'QPStrend' || k == 'RTtrend') {
+	          item[k] = {
+	            content: React.createElement(ArrowSpan, { data: item[k] })
+	          };
+	        } else {
+	          item[k] = {
+	            content: item[k]
+	          };
+	        };
+	      });
+	    });
 
 	    //转换数字  
 	    hack.wrapNum(rowData);
 
-	    // State
-	    var config = {
-	      fixedHeader: true,
-	      stripedRows: false,
-	      showRowHover: true,
-	      selectable: true,
-	      multiSelectable: false,
-	      deselectOnClickaway: true,
-	      displayRowCheckbox: false,
-	      displaySelectAll: false,
-	      height: '300px',
-	      rowData: rowData
-	    };
-
-	    // Column configuration
-	    var headerCols = {
-	      linkName: {
-	        content: '核心链路'
-	      },
-	      QPS: {
-	        content: 'QPS'
-	      },
-	      QPStrend: {
-	        content: '趋势'
-	      },
-	      RT: {
-	        content: 'RT'
-	      },
-	      RTtrend: {
-	        content: '趋势'
-	      }
-	    };
-	    var colOrder = ['linkName', 'QPS', 'QPStrend', 'RT', 'RTtrend'];
-
 	    return React.createElement(Table, _extends({
 	      headerColumns: headerCols,
-	      columnOrder: colOrder
-	    }, config));
+	      columnOrder: colOrder,
+	      rowData: rowData
+	    }, tableConfig));
 	  }
 	});
 
@@ -43787,63 +43820,54 @@
 
 /***/ },
 /* 356 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var ArrowSpan = React.createClass({
+	  displayName: 'ArrowSpan',
+
+	  render: function render() {
+	    var value = this.props.data,
+	        addClass = null,
+	        arrow = null;
+	    if (!isNaN(value)) {
+	      if (value < 0) {
+	        addClass = {
+	          color: '#03b401',
+	          paddingRight: '12px'
+	        };
+	        arrow = '↓';
+	        value += arrow;
+	      } else {
+	        addClass = {
+	          color: '#c10000',
+	          paddingRight: '12px'
+	        };
+	        arrow = '↑';
+	        value += arrow;
+	      }
+	    }
+	    return React.createElement(
+	      'span',
+	      { style: addClass },
+	      value
+	    );
+	  }
+	});
+
+	module.exports = ArrowSpan;
+
+/***/ },
+/* 357 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	var pagesData = __webpack_require__(358).pages;
+	var apiAddress = __webpack_require__(358).apiAddress;
 
-	var React = __webpack_require__(5);
-	var mui = __webpack_require__(197);
-	var Table = mui.Table;
-	var hack = __webpack_require__(355);
-	var Link = __webpack_require__(1).Link;
-	var pagesData = __webpack_require__(357).pages;
-	var apiAddress = __webpack_require__(357).apiAddress;
-
-	// Column configuration
-	var headerCols = {
-	  core: {
-	    content: '核心链路'
-	  },
-	  feature: {
-	    content: '功能点'
-	  },
-	  URL: {
-	    content: 'URL',
-	    style: {
-	      width: '350px'
-	    }
-	  },
-	  QPS: {
-	    content: 'QPS'
-	  },
-	  QPStrend: {
-	    content: '趋势'
-	  },
-	  RT: {
-	    content: 'RT'
-	  },
-	  RTtrend: {
-	    content: '趋势'
-	  }
-	};
-	var colOrder = ['core', 'feature', 'URL', 'QPS', 'QPStrend', 'RT', 'RTtrend'];
-	var tableConfig = {
-	  fixedHeader: true,
-	  stripedRows: false,
-	  showRowHover: true,
-	  selectable: true,
-	  multiSelectable: false,
-	  deselectOnClickaway: true,
-	  displayRowCheckbox: false,
-	  displaySelectAll: false,
-	  height: '600px'
-	};
-
-	module.exports = React.createClass({
-	  displayName: 'exports',
-
+	var TableMixin = {
 	  getInitialState: function getInitialState() {
 	    return {
 	      rowData: pagesData.map(function (item) {
@@ -43861,56 +43885,6 @@
 	      })
 	    };
 	  },
-	  render: function render() {
-	    var rowData = JSON.parse(JSON.stringify(this.state.rowData));
-
-	    rowData.forEach(function (item) {
-	      item.QPStrend = ((1 - item.QPScontrast / item.QPS) * 100).toFixed(2);
-	      item.RTtrend = ((1 - item.RTcontrast / item.RT) * 100).toFixed(2);
-
-	      Object.keys(item).forEach(function (k) {
-	        if (k == 'feature') {
-	          item[k] = {
-	            content: React.createElement(
-	              Link,
-	              { to: 'detail', params: { id: 'chart' } },
-	              item[k]
-	            )
-	          };
-	        } else {
-	          if (k == 'QPS' || k == 'RT') {
-	            item[k] = {
-	              content: item[k] == null ? React.createElement(
-	                'span',
-	                null,
-	                'null'
-	              ) : item[k]
-	            };
-	          } else if (k == 'URL') {
-	            item[k] = {
-	              content: item[k],
-	              style: {
-	                width: '350px'
-	              }
-	            };
-	          } else {
-	            item[k] = {
-	              content: item[k]
-	            };
-	          }
-	        }
-	      });
-	    });
-
-	    hack.wrapNum(rowData);
-
-	    return React.createElement(Table, _extends({
-	      headerColumns: headerCols,
-	      columnOrder: colOrder,
-	      rowData: rowData
-	    }, tableConfig));
-	  },
-
 	  componentDidMount: function componentDidMount() {
 	    this.interval = setInterval((function () {
 	      this.updateAllRow();
@@ -43969,10 +43943,12 @@
 	      }
 	    }).bind(this));
 	  }
-	});
+	};
+
+	module.exports = TableMixin;
 
 /***/ },
-/* 357 */
+/* 358 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -44172,7 +44148,127 @@
 	};
 
 /***/ },
-/* 358 */
+/* 359 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var React = __webpack_require__(5);
+	var mui = __webpack_require__(197);
+	var Table = mui.Table;
+	var hack = __webpack_require__(355);
+	var Link = __webpack_require__(1).Link;
+	var ArrowSpan = __webpack_require__(356);
+	var TableMixin = __webpack_require__(357);
+
+	// Column configuration
+	var headerCols = {
+	  core: {
+	    content: '核心链路'
+	  },
+	  feature: {
+	    content: '功能点'
+	  },
+	  URL: {
+	    content: 'URL',
+	    style: {
+	      width: '300px'
+	    }
+	  },
+	  QPS: {
+	    content: 'QPS'
+	  },
+	  QPStrend: {
+	    content: '趋势'
+	  },
+	  RT: {
+	    content: 'RT'
+	  },
+	  RTtrend: {
+	    content: '趋势'
+	  }
+	};
+	var colOrder = ['core', 'feature', 'URL', 'QPS', 'QPStrend', 'RT', 'RTtrend'];
+	var tableConfig = {
+	  fixedHeader: true,
+	  stripedRows: false,
+	  showRowHover: true,
+	  selectable: true,
+	  multiSelectable: false,
+	  deselectOnClickaway: true,
+	  displayRowCheckbox: false,
+	  displaySelectAll: false,
+	  height: '600px'
+	};
+
+	module.exports = React.createClass({
+	  displayName: 'exports',
+
+	  mixins: [TableMixin],
+
+	  render: function render() {
+	    var rowData = JSON.parse(JSON.stringify(this.state.rowData));
+
+	    rowData.forEach(function (item) {
+	      item.QPStrend = ((1 - item.QPScontrast / item.QPS) * 100).toFixed(0);
+	      item.RTtrend = ((1 - item.RTcontrast / item.RT) * 100).toFixed(0);
+
+	      Object.keys(item).forEach(function (k) {
+	        if (k == 'feature') {
+	          item[k] = {
+	            content: React.createElement(
+	              Link,
+	              { to: 'detail', params: { id: 'chart' } },
+	              item[k]
+	            )
+	          };
+	        } else {
+	          if (k == 'QPS' || k == 'RT') {
+	            item[k] = {
+	              content: item[k] == null ? React.createElement(
+	                'span',
+	                null,
+	                'null'
+	              ) : item[k]
+	            };
+	          } else if (k == 'URL') {
+	            item[k] = {
+	              content: item[k],
+	              style: {
+	                width: '300px'
+	              }
+	            };
+	          } else if (k == 'QPStrend' || k == 'RTtrend') {
+	            item[k] = {
+	              content: React.createElement(ArrowSpan, { data: item[k] })
+	            };
+	          } else {
+	            item[k] = {
+	              content: item[k]
+	            };
+	          };
+	        }
+	      });
+	    });
+
+	    hack.wrapNum(rowData);
+
+	    return React.createElement(
+	      'div',
+	      null,
+	      React.createElement(Table, _extends({
+	        headerColumns: headerCols,
+	        columnOrder: colOrder,
+	        rowData: rowData
+	      }, tableConfig))
+	    );
+	  }
+	});
+
+/***/ },
+/* 360 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -44181,10 +44277,10 @@
 	var mui = __webpack_require__(197);
 	var DropDownMenu = mui.DropDownMenu;
 	var TextField = mui.TextField;
-	var ButtonSelects = __webpack_require__(542);
-	var QPSChart = __webpack_require__(359);
-	var RTChart = __webpack_require__(543);
-	var pagesData = __webpack_require__(357).pages;
+	var ButtonSelects = __webpack_require__(544);
+	var QPSChart = __webpack_require__(361);
+	var RTChart = __webpack_require__(545);
+	var pagesData = __webpack_require__(358).pages;
 
 	var DetailChart = React.createClass({
 	  displayName: 'DetailChart',
@@ -44294,18 +44390,18 @@
 	module.exports = DetailChart;
 
 /***/ },
-/* 359 */
+/* 361 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(5);
-	var Echarts = __webpack_require__(360);
-	var apiAddress = __webpack_require__(357).apiAddress;
-	var pagesData = __webpack_require__(357).pages;
-	var moment = __webpack_require__(443);
-	__webpack_require__(531);
-	__webpack_require__(541);
+	var Echarts = __webpack_require__(362);
+	var apiAddress = __webpack_require__(358).apiAddress;
+	var pagesData = __webpack_require__(358).pages;
+	var moment = __webpack_require__(445);
+	__webpack_require__(533);
+	__webpack_require__(543);
 
 	module.exports = React.createClass({
 	  displayName: 'exports',
@@ -44407,7 +44503,7 @@
 	      var chartData = [{
 	        name: tName,
 	        keys: kv.keys.map(function (item) {
-	          return moment(item * 1000).format('MM-DD hh');
+	          return moment(item * 1000).format('MM-DD HH:mm');
 	        }),
 	        values: kv.values.map(function (item) {
 	          return (item / 60).toFixed(2);
@@ -44463,13 +44559,13 @@
 	});
 
 /***/ },
-/* 360 */
+/* 362 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(5);
-	var echarts = __webpack_require__(361);
+	var echarts = __webpack_require__(363);
 
 	var Echarts = React.createClass({
 	    displayName: 'Echarts',
@@ -44512,7 +44608,7 @@
 	module.exports = Echarts;
 
 /***/ },
-/* 361 */
+/* 363 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -44533,13 +44629,13 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var ecConfig = __webpack_require__(363);
-	    var zrUtil = __webpack_require__(364);
-	    var zrEvent = __webpack_require__(366);
+	    var ecConfig = __webpack_require__(365);
+	    var zrUtil = __webpack_require__(366);
+	    var zrEvent = __webpack_require__(368);
 
 	    var self = {};
 
-	    var _canvasSupported = __webpack_require__(368).canvasSupported;
+	    var _canvasSupported = __webpack_require__(370).canvasSupported;
 	    var _idBase = new Date() - 0;
 	    var _instances = {};    // ECharts实例map索引
 	    var DOM_ATTRIBUTE_KEY = '_echarts_instance_';
@@ -44552,7 +44648,7 @@
 	     * 入口方法
 	     */
 	    self.init = function (dom, theme) {
-	        var zrender = __webpack_require__(369);
+	        var zrender = __webpack_require__(371);
 	        if ((zrender.version.replace('.', '') - 0) < (self.dependencies.zrender.replace('.', '') - 0)) {
 	            console.error(
 	                'ZRender ' + zrender.version
@@ -44645,7 +44741,7 @@
 	     * @const
 	     * @type {Object}
 	     */
-	    var ZR_EVENT = __webpack_require__(371).EVENT;
+	    var ZR_EVENT = __webpack_require__(373).EVENT;
 
 	    /**
 	     * 要绑定监听的zrender事件列表
@@ -44689,7 +44785,7 @@
 	         */
 	        _init: function () {
 	            var self = this;
-	            var _zr = __webpack_require__(369).init(this.dom);
+	            var _zr = __webpack_require__(371).init(this.dom);
 	            this._zr = _zr;
 
 	            // wrap: n,e,d,t for name event data this
@@ -44746,20 +44842,20 @@
 
 	            // 内置图表
 	            // 孤岛
-	            var Island = __webpack_require__(392);
+	            var Island = __webpack_require__(394);
 	            this._island = new Island(this._themeConfig, this._messageCenter, _zr, {}, this);
 	            this.chart.island = this._island;
 
 	            // 内置通用组件
 	            // 工具箱
-	            var Toolbox = __webpack_require__(422);
+	            var Toolbox = __webpack_require__(424);
 	            this._toolbox = new Toolbox(this._themeConfig, this._messageCenter, _zr, {}, this);
 	            this.component.toolbox = this._toolbox;
 
-	            var componentLibrary = __webpack_require__(424);
-	            componentLibrary.define('title', __webpack_require__(425));
-	            componentLibrary.define('tooltip', __webpack_require__(426));
-	            componentLibrary.define('legend', __webpack_require__(428));
+	            var componentLibrary = __webpack_require__(426);
+	            componentLibrary.define('title', __webpack_require__(427));
+	            componentLibrary.define('tooltip', __webpack_require__(428));
+	            componentLibrary.define('legend', __webpack_require__(430));
 
 	            if (_zr.getWidth() === 0 || _zr.getHeight() === 0) {
 	                console.error('Dom’s width & height should be ready before init.');
@@ -45107,7 +45203,7 @@
 	         */
 	        _eventPackage: function (target) {
 	            if (target) {
-	                var ecData = __webpack_require__(411);
+	                var ecData = __webpack_require__(413);
 
 	                var seriesIndex = ecData.get(target, 'seriesIndex');
 	                var dataIndex = ecData.get(target, 'dataIndex');
@@ -45196,8 +45292,8 @@
 	            this._zr.clearAnimation();
 	            this._chartList = [];
 
-	            var chartLibrary = __webpack_require__(362);
-	            var componentLibrary = __webpack_require__(424);
+	            var chartLibrary = __webpack_require__(364);
+	            var componentLibrary = __webpack_require__(426);
 
 	            if (magicOption.xAxis || magicOption.yAxis) {
 	                magicOption.grid = magicOption.grid || {};
@@ -45434,7 +45530,7 @@
 	            }
 
 	            this._zr.getColor = function (idx) {
-	                var zrColor = __webpack_require__(383);
+	                var zrColor = __webpack_require__(385);
 	                return zrColor.getColor(idx, themeColor);
 	            };
 
@@ -45573,7 +45669,7 @@
 	         */
 	        _setTimelineOption: function(option) {
 	            this._timeline && this._timeline.dispose();
-	            var Timeline = __webpack_require__(432);
+	            var Timeline = __webpack_require__(434);
 	            var timeline = new Timeline(
 	                this._themeConfig, this._messageCenter, this._zr, option, this
 	            );
@@ -45950,9 +46046,9 @@
 	            zrDom.style.height = (maxBottom - minTop) + 'px';
 	            document.body.appendChild(zrDom);
 
-	            var zrImg = __webpack_require__(369).init(zrDom);
+	            var zrImg = __webpack_require__(371).init(zrDom);
 
-	            var ImageShape = __webpack_require__(386);
+	            var ImageShape = __webpack_require__(388);
 	            for (var c in imgList) {
 	                zrImg.addShape(new ImageShape({
 	                    style: {
@@ -46088,12 +46184,12 @@
 	         */
 	        showLoading: function (loadingOption) {
 	            var effectList = {
-	                bar: __webpack_require__(434),
-	                bubble: __webpack_require__(435),
-	                dynamicLine: __webpack_require__(436),
-	                ring: __webpack_require__(437),
-	                spin: __webpack_require__(439),
-	                whirling: __webpack_require__(440)
+	                bar: __webpack_require__(436),
+	                bubble: __webpack_require__(437),
+	                dynamicLine: __webpack_require__(438),
+	                ring: __webpack_require__(439),
+	                spin: __webpack_require__(441),
+	                whirling: __webpack_require__(442)
 	            };
 	            this._toolbox.hideDataView();
 
@@ -46161,10 +46257,10 @@
 	                    // 默认主题
 	                    switch (theme) {
 	                        case 'macarons':
-	                            theme = __webpack_require__(441);
+	                            theme = __webpack_require__(443);
 	                            break;
 	                        case 'infographic':
-	                            theme = __webpack_require__(442);
+	                            theme = __webpack_require__(444);
 	                            break;
 	                        default:
 	                            theme = {}; // require('./theme/default');
@@ -46276,7 +46372,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 362 */
+/* 364 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -46312,7 +46408,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 363 */
+/* 365 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -46551,7 +46647,7 @@
 
 
 /***/ },
-/* 364 */
+/* 366 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -46657,7 +46753,7 @@
 
 	        function getContext() {
 	            if (!_ctx) {
-	                __webpack_require__(365);
+	                __webpack_require__(367);
 	                /* jshint ignore:start */
 	                if (window['G_vmlCanvasManager']) {
 	                    var _div = document.createElement('div');
@@ -46811,7 +46907,7 @@
 
 
 /***/ },
-/* 365 */
+/* 367 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;// Copyright 2006 Google Inc.
@@ -48273,7 +48369,7 @@
 
 
 /***/ },
-/* 366 */
+/* 368 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -48285,7 +48381,7 @@
 
 	        'use strict';
 
-	        var Eventful = __webpack_require__(367);
+	        var Eventful = __webpack_require__(369);
 
 	        /**
 	        * 提取鼠标（手指）x坐标
@@ -48354,7 +48450,7 @@
 
 
 /***/ },
-/* 367 */
+/* 369 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -48627,7 +48723,7 @@
 
 
 /***/ },
-/* 368 */
+/* 370 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -48712,7 +48808,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 369 */
+/* 371 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -48737,16 +48833,16 @@
 	         * http://explorercanvas.googlecode.com/svn/trunk/excanvas.js
 	         */
 	        // 核心代码会生成一个全局变量 G_vmlCanvasManager，模块改造后借用于快速判断canvas支持
-	        __webpack_require__(365);
+	        __webpack_require__(367);
 
-	        var util = __webpack_require__(364);
-	        var log = __webpack_require__(370);
-	        var guid = __webpack_require__(372);
+	        var util = __webpack_require__(366);
+	        var log = __webpack_require__(372);
+	        var guid = __webpack_require__(374);
 
-	        var Handler = __webpack_require__(373);
-	        var Painter = __webpack_require__(376);
-	        var Storage = __webpack_require__(387);
-	        var Animation = __webpack_require__(389);
+	        var Handler = __webpack_require__(375);
+	        var Painter = __webpack_require__(378);
+	        var Storage = __webpack_require__(389);
+	        var Animation = __webpack_require__(391);
 
 	        var _instances = {};    // ZRender实例map索引
 
@@ -48846,7 +48942,7 @@
 	             * @type {string}
 	             */
 	            this.id = id;
-	            this.env = __webpack_require__(368);
+	            this.env = __webpack_require__(370);
 
 	            this.storage = new Storage();
 	            this.painter = new Painter(dom, this.storage);
@@ -49296,11 +49392,11 @@
 
 
 /***/ },
-/* 370 */
+/* 372 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var config = __webpack_require__(371);
+	        var config = __webpack_require__(373);
 
 	        /**
 	         * @exports zrender/tool/log
@@ -49334,7 +49430,7 @@
 
 
 /***/ },
-/* 371 */
+/* 373 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
@@ -49460,7 +49556,7 @@
 
 
 /***/ },
-/* 372 */
+/* 374 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -49479,7 +49575,7 @@
 
 
 /***/ },
-/* 373 */
+/* 375 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -49495,15 +49591,15 @@
 
 	        'use strict';
 
-	        var config = __webpack_require__(371);
-	        var env = __webpack_require__(368);
-	        var eventTool = __webpack_require__(366);
-	        var util = __webpack_require__(364);
-	        var vec2 = __webpack_require__(374);
-	        var mat2d = __webpack_require__(375);
+	        var config = __webpack_require__(373);
+	        var env = __webpack_require__(370);
+	        var eventTool = __webpack_require__(368);
+	        var util = __webpack_require__(366);
+	        var vec2 = __webpack_require__(376);
+	        var mat2d = __webpack_require__(377);
 	        var EVENT = config.EVENT;
 
-	        var Eventful = __webpack_require__(367);
+	        var Eventful = __webpack_require__(369);
 
 	        var domHandlerNames = [
 	            'resize', 'click', 'dblclick',
@@ -50498,7 +50594,7 @@
 
 
 /***/ },
-/* 374 */
+/* 376 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
@@ -50780,7 +50876,7 @@
 
 
 /***/ },
-/* 375 */
+/* 377 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
@@ -50936,7 +51032,7 @@
 
 
 /***/ },
-/* 376 */
+/* 378 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -50949,14 +51045,14 @@
 	 !(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	        'use strict';
 
-	        var config = __webpack_require__(371);
-	        var util = __webpack_require__(364);
+	        var config = __webpack_require__(373);
+	        var util = __webpack_require__(366);
 	        // var vec2 = require('./tool/vector');
-	        var log = __webpack_require__(370);
+	        var log = __webpack_require__(372);
 	        // var matrix = require('./tool/matrix');
-	        var BaseLoadingEffect = __webpack_require__(377);
+	        var BaseLoadingEffect = __webpack_require__(379);
 
-	        var Layer = __webpack_require__(385);
+	        var Layer = __webpack_require__(387);
 
 	        // 返回false的方法，用于避免页面被选中
 	        function returnFalse() {
@@ -51704,7 +51800,7 @@
 	                shape.brush(ctx, false);
 	            }
 
-	            var ImageShape = __webpack_require__(386);
+	            var ImageShape = __webpack_require__(388);
 	            var imgShape = new ImageShape({
 	                id : id,
 	                style : {
@@ -51748,7 +51844,7 @@
 
 
 /***/ },
-/* 377 */
+/* 379 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -51759,9 +51855,9 @@
 	 */
 
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
-	        var util = __webpack_require__(364);
-	        var TextShape = __webpack_require__(378);
-	        var RectangleShape = __webpack_require__(384);
+	        var util = __webpack_require__(366);
+	        var TextShape = __webpack_require__(380);
+	        var RectangleShape = __webpack_require__(386);
 
 
 	        var DEFAULT_TEXT = 'Loading...';
@@ -51911,7 +52007,7 @@
 
 
 /***/ },
-/* 378 */
+/* 380 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -51952,8 +52048,8 @@
 	 */
 
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var area = __webpack_require__(379);
-	        var Base = __webpack_require__(381);
+	        var area = __webpack_require__(381);
+	        var Base = __webpack_require__(383);
 	        
 	        /**
 	         * @alias module:zrender/shape/Text
@@ -52119,14 +52215,14 @@
 	            }
 	        };
 
-	        __webpack_require__(364).inherits(Text, Base);
+	        __webpack_require__(366).inherits(Text, Base);
 	        return Text;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 
 /***/ },
-/* 379 */
+/* 381 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -52143,8 +52239,8 @@
 
 	        'use strict';
 
-	        var util = __webpack_require__(364);
-	        var curve = __webpack_require__(380);
+	        var util = __webpack_require__(366);
+	        var curve = __webpack_require__(382);
 
 	        var _ctx;
 	        
@@ -52989,7 +53085,7 @@
 
 
 /***/ },
-/* 380 */
+/* 382 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -52999,7 +53095,7 @@
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-	    var vector = __webpack_require__(374);
+	    var vector = __webpack_require__(376);
 
 	    'use strict';
 
@@ -53533,7 +53629,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 381 */
+/* 383 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -53576,13 +53672,13 @@
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 	        var vmlCanvasManager = window['G_vmlCanvasManager'];
 
-	        var matrix = __webpack_require__(375);
-	        var guid = __webpack_require__(372);
-	        var util = __webpack_require__(364);
-	        var log = __webpack_require__(370);
+	        var matrix = __webpack_require__(377);
+	        var guid = __webpack_require__(374);
+	        var util = __webpack_require__(366);
+	        var log = __webpack_require__(372);
 
-	        var Transformable = __webpack_require__(382);
-	        var Eventful = __webpack_require__(367);
+	        var Transformable = __webpack_require__(384);
+	        var Eventful = __webpack_require__(369);
 
 	        function _fillText(ctx, text, x, y, textFont, textAlign, textBaseline) {
 	            if (textFont) {
@@ -53595,7 +53691,7 @@
 	            );
 	            
 	            text = (text + '').split('\n');
-	            var lineHeight = __webpack_require__(379).getTextHeight('国', textFont);
+	            var lineHeight = __webpack_require__(381).getTextHeight('国', textFont);
 	            
 	            switch (textBaseline) {
 	                case 'top':
@@ -53625,7 +53721,7 @@
 	         * @param {string} textBaseline
 	         */
 	        function _getTextRect(text, x, y, textFont, textAlign, textBaseline) {
-	            var area = __webpack_require__(379);
+	            var area = __webpack_require__(381);
 	            var width = area.getTextWidth(text, textFont);
 	            var lineHeight = area.getTextHeight('国', textFont);
 	            
@@ -53918,7 +54014,7 @@
 	                newStyle[k] = style[k];
 	            }
 
-	            var color = __webpack_require__(383);
+	            var color = __webpack_require__(385);
 	            var highlightColor = color.getHighlightColor();
 	            // 根据highlightStyle扩展
 	            if (style.brushType != 'stroke') {
@@ -54003,7 +54099,7 @@
 	            // 快速预判并保留判断矩形
 	            if (this.isCoverRect(x, y)) {
 	                // 矩形内
-	                return __webpack_require__(379).isInside(this, this.style, x, y);
+	                return __webpack_require__(381).isInside(this, this.style, x, y);
 	            }
 	            
 	            return false;
@@ -54211,7 +54307,7 @@
 
 
 /***/ },
-/* 382 */
+/* 384 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -54223,8 +54319,8 @@
 
 	    'use strict';
 
-	    var matrix = __webpack_require__(375);
-	    var vector = __webpack_require__(374);
+	    var matrix = __webpack_require__(377);
+	    var vector = __webpack_require__(376);
 	    var origin = [0, 0];
 
 	    var mTranslate = matrix.translate;
@@ -54466,7 +54562,7 @@
 
 
 /***/ },
-/* 383 */
+/* 385 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -54474,7 +54570,7 @@
 	 * @module zrender/tool/color
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
-	    var util = __webpack_require__(364);
+	    var util = __webpack_require__(366);
 
 	    var _ctx;
 
@@ -55546,7 +55642,7 @@
 
 
 /***/ },
-/* 384 */
+/* 386 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -55595,7 +55691,7 @@
 	 *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var Base = __webpack_require__(381);
+	        var Base = __webpack_require__(383);
 	        
 	        /**
 	         * @alias module:zrender/shape/Rectangle
@@ -55750,13 +55846,13 @@
 	            }
 	        };
 
-	        __webpack_require__(364).inherits(Rectangle, Base);
+	        __webpack_require__(366).inherits(Rectangle, Base);
 	        return Rectangle;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 385 */
+/* 387 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -55765,10 +55861,10 @@
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var Transformable = __webpack_require__(382);
-	    var util = __webpack_require__(364);
+	    var Transformable = __webpack_require__(384);
+	    var util = __webpack_require__(366);
 	    var vmlCanvasManager = window['G_vmlCanvasManager'];
-	    var config = __webpack_require__(371);
+	    var config = __webpack_require__(373);
 
 	    function returnFalse() {
 	        return false;
@@ -55975,7 +56071,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 386 */
+/* 388 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -56021,7 +56117,7 @@
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	        var Base = __webpack_require__(381);
+	        var Base = __webpack_require__(383);
 
 	        /**
 	         * @alias zrender/shape/Image
@@ -56174,13 +56270,13 @@
 	            }
 	        };
 
-	        __webpack_require__(364).inherits(ZImage, Base);
+	        __webpack_require__(366).inherits(ZImage, Base);
 	        return ZImage;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 387 */
+/* 389 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -56194,9 +56290,9 @@
 
 	        'use strict';
 
-	        var util = __webpack_require__(364);
+	        var util = __webpack_require__(366);
 
-	        var Group = __webpack_require__(388);
+	        var Group = __webpack_require__(390);
 
 	        var defaultIterateOption = {
 	            hover: false,
@@ -56601,7 +56697,7 @@
 
 
 /***/ },
-/* 388 */
+/* 390 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -56625,11 +56721,11 @@
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-	    var guid = __webpack_require__(372);
-	    var util = __webpack_require__(364);
+	    var guid = __webpack_require__(374);
+	    var util = __webpack_require__(366);
 
-	    var Transformable = __webpack_require__(382);
-	    var Eventful = __webpack_require__(367);
+	    var Transformable = __webpack_require__(384);
+	    var Eventful = __webpack_require__(369);
 
 	    /**
 	     * @alias module:zrender/Group
@@ -56837,7 +56933,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 389 */
+/* 391 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -56850,10 +56946,10 @@
 	        
 	        'use strict';
 
-	        var Clip = __webpack_require__(390);
-	        var color = __webpack_require__(383);
-	        var util = __webpack_require__(364);
-	        var Dispatcher = __webpack_require__(366).Dispatcher;
+	        var Clip = __webpack_require__(392);
+	        var color = __webpack_require__(385);
+	        var util = __webpack_require__(366);
+	        var Dispatcher = __webpack_require__(368).Dispatcher;
 
 	        var requestAnimationFrame = window.requestAnimationFrame
 	                                    || window.msRequestAnimationFrame
@@ -57458,7 +57554,7 @@
 
 
 /***/ },
-/* 390 */
+/* 392 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -57475,7 +57571,7 @@
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-	        var Easing = __webpack_require__(391);
+	        var Easing = __webpack_require__(393);
 
 	        function Clip(options) {
 
@@ -57566,7 +57662,7 @@
 
 
 /***/ },
-/* 391 */
+/* 393 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
@@ -57919,7 +58015,7 @@
 
 
 /***/ },
-/* 392 */
+/* 394 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -57930,12 +58026,12 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var ChartBase = __webpack_require__(393);
+	    var ChartBase = __webpack_require__(395);
 	    
 	    // 图形依赖
-	    var CircleShape = __webpack_require__(414);
+	    var CircleShape = __webpack_require__(416);
 	    
-	    var ecConfig = __webpack_require__(363);
+	    var ecConfig = __webpack_require__(365);
 	    ecConfig.island = {
 	        zlevel: 0,                  // 一级层叠
 	        z: 5,                       // 二级层叠
@@ -57943,9 +58039,9 @@
 	        calculateStep: 0.1  // 滚轮可计算步长 0.1 = 10%
 	    };
 
-	    var ecData = __webpack_require__(411);
-	    var zrUtil = __webpack_require__(364);
-	    var zrEvent = __webpack_require__(366);
+	    var ecData = __webpack_require__(413);
+	    var zrUtil = __webpack_require__(366);
+	    var zrEvent = __webpack_require__(368);
 	    
 	    /**
 	     * 构造函数
@@ -58002,8 +58098,8 @@
 	         * @param {Object} srcShape 源目标，合入目标后删除
 	         */
 	        _combine: function (tarShape, srcShape) {
-	            var zrColor = __webpack_require__(383);
-	            var accMath = __webpack_require__(415);
+	            var zrColor = __webpack_require__(385);
+	            var accMath = __webpack_require__(417);
 	            var value = accMath.accAdd(
 	                            ecData.get(tarShape, 'value'),
 	                            ecData.get(srcShape, 'value')
@@ -58169,13 +58265,13 @@
 	    zrUtil.inherits(Island, ChartBase);
 	    
 	    // 图表注册
-	    __webpack_require__(362).define('island', Island);
+	    __webpack_require__(364).define('island', Island);
 	    
 	    return Island;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 393 */
+/* 395 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -58187,23 +58283,23 @@
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	    // 图形依赖
-	    var ImageShape = __webpack_require__(386);
-	    var IconShape = __webpack_require__(394);
-	    var MarkLineShape = __webpack_require__(400);
-	    var SymbolShape = __webpack_require__(404);
-	    var PolylineShape = __webpack_require__(409);
-	    var ShapeBundle = __webpack_require__(410);
+	    var ImageShape = __webpack_require__(388);
+	    var IconShape = __webpack_require__(396);
+	    var MarkLineShape = __webpack_require__(402);
+	    var SymbolShape = __webpack_require__(406);
+	    var PolylineShape = __webpack_require__(411);
+	    var ShapeBundle = __webpack_require__(412);
 	    
-	    var ecConfig = __webpack_require__(363);
-	    var ecData = __webpack_require__(411);
-	    var ecAnimation = __webpack_require__(412);
-	    var ecEffect = __webpack_require__(413);
-	    var accMath = __webpack_require__(415);
-	    var ComponentBase = __webpack_require__(416);
-	    var EdgeBundling = __webpack_require__(419);
+	    var ecConfig = __webpack_require__(365);
+	    var ecData = __webpack_require__(413);
+	    var ecAnimation = __webpack_require__(414);
+	    var ecEffect = __webpack_require__(415);
+	    var accMath = __webpack_require__(417);
+	    var ComponentBase = __webpack_require__(418);
+	    var EdgeBundling = __webpack_require__(421);
 
-	    var zrUtil = __webpack_require__(364);
-	    var zrArea = __webpack_require__(379);
+	    var zrUtil = __webpack_require__(366);
+	    var zrArea = __webpack_require__(381);
 
 	    // Some utility functions
 	    function isCoordAvailable(coord) {
@@ -59888,7 +59984,7 @@
 
 
 /***/ },
-/* 394 */
+/* 396 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -59925,7 +60021,7 @@
 	   }
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var zrUtil = __webpack_require__(364);
+	    var zrUtil = __webpack_require__(366);
 	    
 	    function _iconMark(ctx, style) {
 	        var x = style.x;
@@ -60334,7 +60430,7 @@
 	    }
 	    
 	    function _iconStar(ctx, style) {
-	        var StarShape = __webpack_require__(395);
+	        var StarShape = __webpack_require__(397);
 	        var width = style.width / 2;
 	        var height = style.height / 2;
 	        StarShape.prototype.buildPath(ctx, {
@@ -60346,7 +60442,7 @@
 	    }
 	    
 	    function _iconHeart(ctx, style) {
-	        var HeartShape = __webpack_require__(397);
+	        var HeartShape = __webpack_require__(399);
 	        HeartShape.prototype.buildPath(ctx, {
 	            x : style.x + style.width / 2,
 	            y : style.y + style.height * 0.2,
@@ -60356,7 +60452,7 @@
 	    }
 	    
 	    function _iconDroplet(ctx, style) {
-	        var DropletShape = __webpack_require__(399);
+	        var DropletShape = __webpack_require__(401);
 	        DropletShape.prototype.buildPath(ctx, {
 	            x : style.x + style.width * 0.5,
 	            y : style.y + style.height * 0.5,
@@ -60383,7 +60479,7 @@
 	    }
 	    
 	    function _iconImage(ctx, style, refreshNextFrame) {
-	        var ImageShape = __webpack_require__(386);
+	        var ImageShape = __webpack_require__(388);
 	        this._imageShape = this._imageShape || new ImageShape({
 	            style: {}
 	        });
@@ -60393,7 +60489,7 @@
 	        this._imageShape.brush(ctx, false, refreshNextFrame);
 	    }
 	    
-	    var Base = __webpack_require__(381);
+	    var Base = __webpack_require__(383);
 	    
 	    function Icon(options) {
 	        Base.call(this, options);
@@ -60436,7 +60532,7 @@
 	            style = style || {};
 	            var iconType = style.iconType || this.style.iconType;
 	            if (iconType === 'image') {
-	                var ImageShape = __webpack_require__(386);
+	                var ImageShape = __webpack_require__(388);
 	                ImageShape.prototype.brush.call(this, ctx, isHighlight, refreshNextFrame);
 
 	            } else {
@@ -60533,7 +60629,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 395 */
+/* 397 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -60584,12 +60680,12 @@
 
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	        var math = __webpack_require__(396);
+	        var math = __webpack_require__(398);
 	        var sin = math.sin;
 	        var cos = math.cos;
 	        var PI = Math.PI;
 
-	        var Base = __webpack_require__(381);
+	        var Base = __webpack_require__(383);
 
 	        /**
 	         * @alias module:zrender/shape/Star
@@ -60695,13 +60791,13 @@
 	            }
 	        };
 
-	        __webpack_require__(364).inherits(Star, Base);
+	        __webpack_require__(366).inherits(Star, Base);
 	        return Star;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 396 */
+/* 398 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -60760,7 +60856,7 @@
 
 
 /***/ },
-/* 397 */
+/* 399 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -60812,9 +60908,9 @@
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	        'use strict';
 	        
-	        var Base = __webpack_require__(381);
-	        var PathProxy = __webpack_require__(398);
-	        var area = __webpack_require__(379);
+	        var Base = __webpack_require__(383);
+	        var PathProxy = __webpack_require__(400);
+	        var area = __webpack_require__(381);
 	        
 	        /**
 	         * @alias module:zrender/shape/Heart
@@ -60899,13 +60995,13 @@
 	            }
 	        };
 
-	        __webpack_require__(364).inherits(Heart, Base);
+	        __webpack_require__(366).inherits(Heart, Base);
 	        return Heart;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 398 */
+/* 400 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -60949,7 +61045,7 @@
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	    
-	    var vector = __webpack_require__(374);
+	    var vector = __webpack_require__(376);
 	    // var computeBoundingBox = require('../../tool/computeBoundingBox');
 
 	    var PathSegment = function(command, points) {
@@ -61163,7 +61259,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 399 */
+/* 401 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -61216,9 +61312,9 @@
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	        'use strict';
 
-	        var Base = __webpack_require__(381);
-	        var PathProxy = __webpack_require__(398);
-	        var area = __webpack_require__(379);
+	        var Base = __webpack_require__(383);
+	        var PathProxy = __webpack_require__(400);
+	        var area = __webpack_require__(381);
 
 	        /**
 	         * @alias module:zrender/shape/Droplet
@@ -61301,13 +61397,13 @@
 	            }
 	        };
 
-	        __webpack_require__(364).inherits(Droplet, Base);
+	        __webpack_require__(366).inherits(Droplet, Base);
 	        return Droplet;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 400 */
+/* 402 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -61332,17 +61428,17 @@
 	 * @property {Array.<number>} symbolRotate
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(381);
-	    var IconShape = __webpack_require__(394);
-	    var LineShape = __webpack_require__(401);
+	    var Base = __webpack_require__(383);
+	    var IconShape = __webpack_require__(396);
+	    var LineShape = __webpack_require__(403);
 	    var lineInstance = new LineShape({});
-	    var CurveShape = __webpack_require__(403);
+	    var CurveShape = __webpack_require__(405);
 	    var curveInstance = new CurveShape({});
 
-	    var area = __webpack_require__(379);
-	    var dashedLineTo = __webpack_require__(402);
-	    var zrUtil = __webpack_require__(364);
-	    var curveTool = __webpack_require__(380);
+	    var area = __webpack_require__(381);
+	    var dashedLineTo = __webpack_require__(404);
+	    var zrUtil = __webpack_require__(366);
+	    var curveTool = __webpack_require__(382);
 
 	    function MarkLine(options) {
 	        Base.call(this, options);
@@ -61561,7 +61657,7 @@
 
 
 /***/ },
-/* 401 */
+/* 403 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -61606,8 +61702,8 @@
 	 *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var Base = __webpack_require__(381);
-	        var dashedLineTo = __webpack_require__(402);
+	        var Base = __webpack_require__(383);
+	        var dashedLineTo = __webpack_require__(404);
 	        
 	        /**
 	         * @alias module:zrender/shape/Line
@@ -61684,13 +61780,13 @@
 	            }
 	        };
 
-	        __webpack_require__(364).inherits(Line, Base);
+	        __webpack_require__(366).inherits(Line, Base);
 	        return Line;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 402 */
+/* 404 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -61744,7 +61840,7 @@
 
 
 /***/ },
-/* 403 */
+/* 405 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -61800,7 +61896,7 @@
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	        'use strict';
 
-	        var Base = __webpack_require__(381);
+	        var Base = __webpack_require__(383);
 	        
 	        /**
 	         * @alias module:zrender/shape/BezierCurve
@@ -61890,13 +61986,13 @@
 	            }
 	        };
 
-	        __webpack_require__(364).inherits(BezierCurve, Base);
+	        __webpack_require__(366).inherits(BezierCurve, Base);
 	        return BezierCurve;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 404 */
+/* 406 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -61933,10 +62029,10 @@
 	   }
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(381);
-	    var PolygonShape = __webpack_require__(405);
+	    var Base = __webpack_require__(383);
+	    var PolygonShape = __webpack_require__(407);
 	    var polygonInstance = new PolygonShape({});
-	    var zrUtil = __webpack_require__(364);
+	    var zrUtil = __webpack_require__(366);
 
 	    function Symbol(options) {
 	        Base.call(this, options);
@@ -62081,7 +62177,7 @@
 	            return style.__rect || polygonInstance.getRect(style);
 	        },
 
-	        isCover : __webpack_require__(408)
+	        isCover : __webpack_require__(410)
 	    };
 
 	    zrUtil.inherits(Symbol, Base);
@@ -62091,7 +62187,7 @@
 
 
 /***/ },
-/* 405 */
+/* 407 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -62135,10 +62231,10 @@
 	 *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var Base = __webpack_require__(381);
-	        var smoothSpline = __webpack_require__(406);
-	        var smoothBezier = __webpack_require__(407);
-	        var dashedLineTo = __webpack_require__(402);
+	        var Base = __webpack_require__(383);
+	        var smoothSpline = __webpack_require__(408);
+	        var smoothBezier = __webpack_require__(409);
+	        var dashedLineTo = __webpack_require__(404);
 
 	        /**
 	         * @alias module:zrender/shape/Polygon
@@ -62303,14 +62399,14 @@
 	            }
 	        };
 
-	        __webpack_require__(364).inherits(Polygon, Base);
+	        __webpack_require__(366).inherits(Polygon, Base);
 	        return Polygon;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 
 /***/ },
-/* 406 */
+/* 408 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -62321,7 +62417,7 @@
 	 *         errorrik (errorrik@gmail.com)
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var vector = __webpack_require__(374);
+	        var vector = __webpack_require__(376);
 
 	        /**
 	         * @inner
@@ -62387,7 +62483,7 @@
 
 
 /***/ },
-/* 407 */
+/* 409 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -62398,7 +62494,7 @@
 	 *         errorrik (errorrik@gmail.com)
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var vector = __webpack_require__(374);
+	        var vector = __webpack_require__(376);
 
 	        /**
 	         * 贝塞尔平滑曲线
@@ -62491,7 +62587,7 @@
 
 
 /***/ },
-/* 408 */
+/* 410 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;// 由于大多数shape默认的isCover都是相同的逻辑
@@ -62510,7 +62606,7 @@
 
 
 /***/ },
-/* 409 */
+/* 411 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -62553,10 +62649,10 @@
 	 *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var Base = __webpack_require__(381);
-	        var smoothSpline = __webpack_require__(406);
-	        var smoothBezier = __webpack_require__(407);
-	        var dashedLineTo = __webpack_require__(402);
+	        var Base = __webpack_require__(383);
+	        var smoothSpline = __webpack_require__(408);
+	        var smoothBezier = __webpack_require__(409);
+	        var dashedLineTo = __webpack_require__(404);
 
 	        /**
 	         * @alias module:zrender/shape/Polyline
@@ -62662,17 +62758,17 @@
 	             * @return {module:zrender/shape/Base~IBoundingRect}
 	             */
 	            getRect : function(style) {
-	                return __webpack_require__(405).prototype.getRect(style);
+	                return __webpack_require__(407).prototype.getRect(style);
 	            }
 	        };
 
-	        __webpack_require__(364).inherits(Polyline, Base);
+	        __webpack_require__(366).inherits(Polyline, Base);
 	        return Polyline;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 410 */
+/* 412 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -62716,7 +62812,7 @@
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var Base = __webpack_require__(381);
+	    var Base = __webpack_require__(383);
 
 	    var ShapeBundle = function (options) {
 	        Base.call(this, options);
@@ -62823,12 +62919,12 @@
 	        }
 	    };
 
-	    __webpack_require__(364).inherits(ShapeBundle, Base);
+	    __webpack_require__(366).inherits(ShapeBundle, Base);
 	    return ShapeBundle;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); 
 
 /***/ },
-/* 411 */
+/* 413 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -62948,7 +63044,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 412 */
+/* 414 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -62959,8 +63055,8 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var zrUtil = __webpack_require__(364);
-	    var curveTool = __webpack_require__(380);
+	    var zrUtil = __webpack_require__(366);
+	    var curveTool = __webpack_require__(382);
 	    
 	    /**
 	     * 折线型动画
@@ -63307,7 +63403,7 @@
 	     * @param {tring} easing
 	     */
 	    function polygon(zr, oldShape, newShape, duration, easing) {
-	        var rect = __webpack_require__(405).prototype.getRect(newShape.style);
+	        var rect = __webpack_require__(407).prototype.getRect(newShape.style);
 	        var x = rect.x + rect.width / 2;
 	        var y = rect.y + rect.height / 2;
 	        
@@ -63578,7 +63674,7 @@
 
 
 /***/ },
-/* 413 */
+/* 415 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -63589,18 +63685,18 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var ecData = __webpack_require__(411);
+	    var ecData = __webpack_require__(413);
 	    
-	    var CircleShape = __webpack_require__(414);
-	    var ImageShape = __webpack_require__(386);
-	    var curveTool = __webpack_require__(380);
-	    var IconShape = __webpack_require__(394);
-	    var SymbolShape = __webpack_require__(404);
-	    var ShapeBundle = __webpack_require__(410);
-	    var Polyline = __webpack_require__(409);
-	    var vec2 = __webpack_require__(374);
+	    var CircleShape = __webpack_require__(416);
+	    var ImageShape = __webpack_require__(388);
+	    var curveTool = __webpack_require__(382);
+	    var IconShape = __webpack_require__(396);
+	    var SymbolShape = __webpack_require__(406);
+	    var ShapeBundle = __webpack_require__(412);
+	    var Polyline = __webpack_require__(411);
+	    var vec2 = __webpack_require__(376);
 
-	    var canvasSupported = __webpack_require__(368).canvasSupported;
+	    var canvasSupported = __webpack_require__(370).canvasSupported;
 	    
 	    function point(zr, effectList, shape, zlevel) {
 	        var effect = shape.effect;
@@ -64028,7 +64124,7 @@
 
 
 /***/ },
-/* 414 */
+/* 416 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -64079,7 +64175,7 @@
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	        'use strict';
 
-	        var Base = __webpack_require__(381);
+	        var Base = __webpack_require__(383);
 
 	        /**
 	         * @alias module:zrender/shape/Circle
@@ -64143,13 +64239,13 @@
 	            }
 	        };
 
-	        __webpack_require__(364).inherits(Circle, Base);
+	        __webpack_require__(366).inherits(Circle, Base);
 	        return Circle;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 415 */
+/* 417 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -64233,7 +64329,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 416 */
+/* 418 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -64244,11 +64340,11 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var ecConfig = __webpack_require__(363);
-	    var ecData = __webpack_require__(411);
-	    var ecQuery = __webpack_require__(418);
-	    var number = __webpack_require__(417);
-	    var zrUtil = __webpack_require__(364);
+	    var ecConfig = __webpack_require__(365);
+	    var ecData = __webpack_require__(413);
+	    var ecQuery = __webpack_require__(420);
+	    var number = __webpack_require__(419);
+	    var zrUtil = __webpack_require__(366);
 	    
 	    function Base(ecTheme, messageCenter, zr, option, myChart){
 	        this.ecTheme = ecTheme;
@@ -64291,7 +64387,7 @@
 	     * 基类方法
 	     */
 	    Base.prototype = {
-	        canvasSupported: __webpack_require__(368).canvasSupported,
+	        canvasSupported: __webpack_require__(370).canvasSupported,
 	        _getZ : function(zWhat) {
 	            if (this[zWhat] != null) {
 	                return this[zWhat];
@@ -64484,7 +64580,7 @@
 
 
 /***/ },
-/* 417 */
+/* 419 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -64580,7 +64676,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 418 */
+/* 420 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -64591,7 +64687,7 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
-	    var zrUtil = __webpack_require__(364);
+	    var zrUtil = __webpack_require__(366);
 	    
 	    /**
 	     * 获取嵌套选项的基础方法
@@ -64667,7 +64763,7 @@
 
 
 /***/ },
-/* 419 */
+/* 421 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -64680,8 +64776,8 @@
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var KDTree = __webpack_require__(420);
-	    var vec2 = __webpack_require__(374);
+	    var KDTree = __webpack_require__(422);
+	    var vec2 = __webpack_require__(376);
 	    var v2Create = vec2.create;
 	    var v2DistSquare = vec2.distSquare;
 	    var v2Dist = vec2.dist;
@@ -65087,7 +65183,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 420 */
+/* 422 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -65098,7 +65194,7 @@
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	    var quickSelect = __webpack_require__(421);
+	    var quickSelect = __webpack_require__(423);
 
 	    function Node(axis, data) {
 	        this.left = null;
@@ -65339,7 +65435,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 421 */
+/* 423 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -65423,7 +65519,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 422 */
+/* 424 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -65434,15 +65530,15 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(416);
+	    var Base = __webpack_require__(418);
 	    
 	    // 图形依赖
-	    var LineShape = __webpack_require__(401);
-	    var ImageShape = __webpack_require__(386);
-	    var RectangleShape = __webpack_require__(384);
-	    var IconShape = __webpack_require__(394);
+	    var LineShape = __webpack_require__(403);
+	    var ImageShape = __webpack_require__(388);
+	    var RectangleShape = __webpack_require__(386);
+	    var IconShape = __webpack_require__(396);
 	    
-	    var ecConfig = __webpack_require__(363);
+	    var ecConfig = __webpack_require__(365);
 	    ecConfig.toolbox = {
 	        zlevel: 0,                  // 一级层叠
 	        z: 6,                       // 二级层叠
@@ -65534,9 +65630,9 @@
 	        }
 	    };
 
-	    var zrUtil = __webpack_require__(364);
-	    var zrConfig = __webpack_require__(371);
-	    var zrEvent = __webpack_require__(366);
+	    var zrUtil = __webpack_require__(366);
+	    var zrConfig = __webpack_require__(373);
+	    var zrEvent = __webpack_require__(368);
 	    
 	    var _MAGICTYPE_STACK = 'stack';
 	    var _MAGICTYPE_TILED = 'tiled';
@@ -65818,7 +65914,7 @@
 	                        break;
 	                    case 'dataView' :
 	                        if (!this._dataView) {
-	                            var DataView = __webpack_require__(423);
+	                            var DataView = __webpack_require__(425);
 	                            this._dataView = new DataView(
 	                                this.ecTheme, this.messageCenter, this.zr, this.option, this.myChart
 	                            );
@@ -66666,14 +66762,14 @@
 	    
 	    zrUtil.inherits(Toolbox, Base);
 	    
-	    __webpack_require__(424).define('toolbox', Toolbox);
+	    __webpack_require__(426).define('toolbox', Toolbox);
 	    
 	    return Toolbox;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 423 */
+/* 425 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -66684,10 +66780,10 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(416);
+	    var Base = __webpack_require__(418);
 
-	    var ecConfig = __webpack_require__(363);
-	    var zrUtil = __webpack_require__(364);
+	    var ecConfig = __webpack_require__(365);
+	    var zrUtil = __webpack_require__(366);
 	    
 	    /**
 	     * 构造函数
@@ -67133,14 +67229,14 @@
 	    
 	    zrUtil.inherits(DataView, Base);
 	    
-	    __webpack_require__(424).define('dataView', DataView);
+	    __webpack_require__(426).define('dataView', DataView);
 	    
 	    return DataView;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 424 */
+/* 426 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -67177,7 +67273,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 425 */
+/* 427 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -67188,13 +67284,13 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(416);
+	    var Base = __webpack_require__(418);
 	    
 	    // 图形依赖
-	    var TextShape = __webpack_require__(378);
-	    var RectangleShape = __webpack_require__(384);
+	    var TextShape = __webpack_require__(380);
+	    var RectangleShape = __webpack_require__(386);
 	    
-	    var ecConfig = __webpack_require__(363);
+	    var ecConfig = __webpack_require__(365);
 	    // 图表标题
 	    ecConfig.title = {
 	        zlevel: 0,                  // 一级层叠
@@ -67229,9 +67325,9 @@
 	        }
 	    };
 	    
-	    var zrUtil = __webpack_require__(364);
-	    var zrArea = __webpack_require__(379);
-	    var zrColor = __webpack_require__(383);
+	    var zrUtil = __webpack_require__(366);
+	    var zrArea = __webpack_require__(381);
+	    var zrColor = __webpack_require__(385);
 	    
 	    /**
 	     * 构造函数
@@ -67485,7 +67581,7 @@
 	    
 	    zrUtil.inherits(Title, Base);
 	    
-	    __webpack_require__(424).define('title', Title);
+	    __webpack_require__(426).define('title', Title);
 	    
 	    return Title;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -67494,7 +67590,7 @@
 
 
 /***/ },
-/* 426 */
+/* 428 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -67505,15 +67601,15 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(416);
+	    var Base = __webpack_require__(418);
 	    
 	    // 图形依赖
-	    var CrossShape = __webpack_require__(427);
-	    var LineShape = __webpack_require__(401);
-	    var RectangleShape = __webpack_require__(384);
+	    var CrossShape = __webpack_require__(429);
+	    var LineShape = __webpack_require__(403);
+	    var RectangleShape = __webpack_require__(386);
 	    var rectangleInstance = new RectangleShape({});
 	    
-	    var ecConfig = __webpack_require__(363);
+	    var ecConfig = __webpack_require__(365);
 	    // 提示框
 	    ecConfig.tooltip = {
 	        zlevel: 1,                  // 一级层叠，频繁变化的tooltip指示器在pc上独立一层
@@ -67557,13 +67653,13 @@
 	        }
 	    };
 
-	    var ecData = __webpack_require__(411);
-	    var zrConfig = __webpack_require__(371);
-	    var zrEvent = __webpack_require__(366);
-	    var zrArea = __webpack_require__(379);
-	    var zrColor = __webpack_require__(383);
-	    var zrUtil = __webpack_require__(364);
-	    var zrShapeBase = __webpack_require__(381);
+	    var ecData = __webpack_require__(413);
+	    var zrConfig = __webpack_require__(373);
+	    var zrEvent = __webpack_require__(368);
+	    var zrArea = __webpack_require__(381);
+	    var zrColor = __webpack_require__(385);
+	    var zrUtil = __webpack_require__(366);
+	    var zrShapeBase = __webpack_require__(383);
 
 	    /**
 	     * 构造函数
@@ -69233,14 +69329,14 @@
 	    
 	    zrUtil.inherits(Tooltip, Base);
 	    
-	    __webpack_require__(424).define('tooltip', Tooltip);
+	    __webpack_require__(426).define('tooltip', Tooltip);
 
 	    return Tooltip;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 427 */
+/* 429 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -69275,9 +69371,9 @@
 	   }
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(381);
-	    var LineShape = __webpack_require__(401);
-	    var zrUtil = __webpack_require__(364);
+	    var Base = __webpack_require__(383);
+	    var LineShape = __webpack_require__(403);
+	    var zrUtil = __webpack_require__(366);
 
 	    function Cross(options) {
 	        Base.call(this, options);
@@ -69311,7 +69407,7 @@
 	            return style.rect;
 	        },
 
-	        isCover : __webpack_require__(408)
+	        isCover : __webpack_require__(410)
 	    };
 
 	    zrUtil.inherits(Cross, Base);
@@ -69321,7 +69417,7 @@
 
 
 /***/ },
-/* 428 */
+/* 430 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -69332,17 +69428,17 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(416);
+	    var Base = __webpack_require__(418);
 	    
 	    // 图形依赖
-	    var TextShape = __webpack_require__(378);
-	    var RectangleShape = __webpack_require__(384);
-	    var SectorShape = __webpack_require__(430);
+	    var TextShape = __webpack_require__(380);
+	    var RectangleShape = __webpack_require__(386);
+	    var SectorShape = __webpack_require__(432);
 	    //var BeziercurveShape = require('zrender/shape/Beziercurve');
-	    var IconShape = __webpack_require__(394);
-	    var CandleShape = __webpack_require__(429);
+	    var IconShape = __webpack_require__(396);
+	    var CandleShape = __webpack_require__(431);
 	    
-	    var ecConfig = __webpack_require__(363);
+	    var ecConfig = __webpack_require__(365);
 	     // 图例
 	    ecConfig.legend = {
 	        zlevel: 0,                  // 一级层叠
@@ -69373,8 +69469,8 @@
 	        // data: [],               // 图例内容（详见legend.data，数组中每一项代表一个item
 	    };
 
-	    var zrUtil = __webpack_require__(364);
-	    var zrArea = __webpack_require__(379);
+	    var zrUtil = __webpack_require__(366);
+	    var zrArea = __webpack_require__(381);
 
 	    /**
 	     * 构造函数
@@ -70290,7 +70386,7 @@
 	    
 	    zrUtil.inherits(Legend, Base);
 	    
-	    __webpack_require__(424).define('legend', Legend);
+	    __webpack_require__(426).define('legend', Legend);
 	    
 	    return Legend;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -70299,7 +70395,7 @@
 
 
 /***/ },
-/* 429 */
+/* 431 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -70352,8 +70448,8 @@
 	   }
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(381);
-	    var zrUtil = __webpack_require__(364);
+	    var Base = __webpack_require__(383);
+	    var zrUtil = __webpack_require__(366);
 
 	    function Candle(options) {
 	        Base.call(this, options);
@@ -70410,7 +70506,7 @@
 	        },
 
 
-	        isCover : __webpack_require__(408)
+	        isCover : __webpack_require__(410)
 	    };
 
 	    zrUtil.inherits(Candle, Base);
@@ -70420,7 +70516,7 @@
 
 
 /***/ },
-/* 430 */
+/* 432 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -70473,10 +70569,10 @@
 
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-	        var math = __webpack_require__(396);
-	        var computeBoundingBox = __webpack_require__(431);
-	        var vec2 = __webpack_require__(374);
-	        var Base = __webpack_require__(381);
+	        var math = __webpack_require__(398);
+	        var computeBoundingBox = __webpack_require__(433);
+	        var vec2 = __webpack_require__(376);
+	        var Base = __webpack_require__(383);
 	        
 	        var min0 = vec2.create();
 	        var min1 = vec2.create();
@@ -70605,13 +70701,13 @@
 	        };
 
 
-	        __webpack_require__(364).inherits(Sector, Base);
+	        __webpack_require__(366).inherits(Sector, Base);
 	        return Sector;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 431 */
+/* 433 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -70620,8 +70716,8 @@
 	 *         errorrik (errorrik@gmail.com)
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var vec2 = __webpack_require__(374);
-	        var curve = __webpack_require__(380);
+	        var vec2 = __webpack_require__(376);
+	        var curve = __webpack_require__(382);
 
 	        /**
 	         * 从顶点数组中计算出最小包围盒，写入`min`和`max`中
@@ -70815,7 +70911,7 @@
 
 
 /***/ },
-/* 432 */
+/* 434 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -70826,14 +70922,14 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(416);
+	    var Base = __webpack_require__(418);
 	    
 	    // 图形依赖
-	    var RectangleShape = __webpack_require__(384);
-	    var IconShape = __webpack_require__(394);
-	    var ChainShape = __webpack_require__(433);
+	    var RectangleShape = __webpack_require__(386);
+	    var IconShape = __webpack_require__(396);
+	    var ChainShape = __webpack_require__(435);
 	    
-	    var ecConfig = __webpack_require__(363);
+	    var ecConfig = __webpack_require__(365);
 	    ecConfig.timeline = {
 	        zlevel: 0,                  // 一级层叠
 	        z: 4,                       // 二级层叠
@@ -70894,9 +70990,9 @@
 	        // data: []
 	    };
 
-	    var zrUtil = __webpack_require__(364);
-	    var zrArea = __webpack_require__(379);
-	    var zrEvent = __webpack_require__(366);
+	    var zrUtil = __webpack_require__(366);
+	    var zrArea = __webpack_require__(381);
+	    var zrEvent = __webpack_require__(368);
 
 	    /**
 	     * 构造函数
@@ -71751,13 +71847,13 @@
 	    
 	    zrUtil.inherits(Timeline, Base);
 	    
-	    __webpack_require__(424).define('timeline', Timeline);
+	    __webpack_require__(426).define('timeline', Timeline);
 	    
 	    return Timeline;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 433 */
+/* 435 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -71768,12 +71864,12 @@
 	 * shape类：时间轴线
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(381);
-	    var IconShape = __webpack_require__(394);
+	    var Base = __webpack_require__(383);
+	    var IconShape = __webpack_require__(396);
 
-	    var dashedLineTo = __webpack_require__(402);
-	    var zrUtil = __webpack_require__(364);
-	    var matrix = __webpack_require__(375);
+	    var dashedLineTo = __webpack_require__(404);
+	    var zrUtil = __webpack_require__(366);
+	    var matrix = __webpack_require__(377);
 
 	    function Chain(options) {
 	        Base.call(this, options);
@@ -71944,15 +72040,15 @@
 
 
 /***/ },
-/* 434 */
+/* 436 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var Base = __webpack_require__(377);
-	        var util = __webpack_require__(364);
-	        var zrColor = __webpack_require__(383);
-	        var RectangleShape = __webpack_require__(384);
+	        var Base = __webpack_require__(379);
+	        var util = __webpack_require__(366);
+	        var zrColor = __webpack_require__(385);
+	        var RectangleShape = __webpack_require__(386);
 
 	        function Bar(options) {
 	            Base.call(this, options);
@@ -72047,15 +72143,15 @@
 
 
 /***/ },
-/* 435 */
+/* 437 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var Base = __webpack_require__(377);
-	        var util = __webpack_require__(364);
-	        var zrColor = __webpack_require__(383);
-	        var CircleShape = __webpack_require__(414);
+	        var Base = __webpack_require__(379);
+	        var util = __webpack_require__(366);
+	        var zrColor = __webpack_require__(385);
+	        var CircleShape = __webpack_require__(416);
 
 	        function Bubble(options) {
 	            Base.call(this, options);
@@ -72151,15 +72247,15 @@
 
 
 /***/ },
-/* 436 */
+/* 438 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var Base = __webpack_require__(377);
-	        var util = __webpack_require__(364);
-	        var zrColor = __webpack_require__(383);
-	        var LineShape = __webpack_require__(401);
+	        var Base = __webpack_require__(379);
+	        var util = __webpack_require__(366);
+	        var zrColor = __webpack_require__(385);
+	        var LineShape = __webpack_require__(403);
 
 	        function DynamicLine(options) {
 	            Base.call(this, options);
@@ -72260,16 +72356,16 @@
 
 
 /***/ },
-/* 437 */
+/* 439 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var Base = __webpack_require__(377);
-	        var util = __webpack_require__(364);
-	        var zrColor = __webpack_require__(383);
-	        var RingShape = __webpack_require__(438);
-	        var SectorShape = __webpack_require__(430);
+	        var Base = __webpack_require__(379);
+	        var util = __webpack_require__(366);
+	        var zrColor = __webpack_require__(385);
+	        var RingShape = __webpack_require__(440);
+	        var SectorShape = __webpack_require__(432);
 
 	        function Ring(options) {
 	            Base.call(this, options);
@@ -72440,7 +72536,7 @@
 
 
 /***/ },
-/* 438 */
+/* 440 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -72486,7 +72582,7 @@
 	 *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var Base = __webpack_require__(381);
+	        var Base = __webpack_require__(383);
 	        
 	        /**
 	         * @alias module:zrender/shape/Ring
@@ -72552,22 +72648,22 @@
 	            }
 	        };
 
-	        __webpack_require__(364).inherits(Ring, Base);
+	        __webpack_require__(366).inherits(Ring, Base);
 	        return Ring;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 439 */
+/* 441 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var Base = __webpack_require__(377);
-	        var util = __webpack_require__(364);
-	        var zrColor = __webpack_require__(383);
-	        var zrArea = __webpack_require__(379);
-	        var SectorShape = __webpack_require__(430);
+	        var Base = __webpack_require__(379);
+	        var util = __webpack_require__(366);
+	        var zrColor = __webpack_require__(385);
+	        var zrArea = __webpack_require__(381);
+	        var SectorShape = __webpack_require__(432);
 
 	        function Spin(options) {
 	            Base.call(this, options);
@@ -72671,17 +72767,17 @@
 
 
 /***/ },
-/* 440 */
+/* 442 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	        var Base = __webpack_require__(377);
-	        var util = __webpack_require__(364);
-	        var zrArea = __webpack_require__(379);
-	        var RingShape = __webpack_require__(438);
-	        var DropletShape = __webpack_require__(399);
-	        var CircleShape = __webpack_require__(414);
+	        var Base = __webpack_require__(379);
+	        var util = __webpack_require__(366);
+	        var zrArea = __webpack_require__(381);
+	        var RingShape = __webpack_require__(440);
+	        var DropletShape = __webpack_require__(401);
+	        var CircleShape = __webpack_require__(416);
 
 	        function Whirling(options) {
 	            Base.call(this, options);
@@ -72793,7 +72889,7 @@
 
 
 /***/ },
-/* 441 */
+/* 443 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
@@ -73055,7 +73151,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 442 */
+/* 444 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
@@ -73358,7 +73454,7 @@
 
 
 /***/ },
-/* 443 */
+/* 445 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(module) {//! moment.js
@@ -73629,7 +73725,7 @@
 	                module && module.exports) {
 	            try {
 	                oldLocale = globalLocale._abbr;
-	                __webpack_require__(445)("./" + name);
+	                __webpack_require__(447)("./" + name);
 	                // because defineLocale currently also sets the global locale, we
 	                // want to undo that for lazy loaded locales
 	                locale_locales__getSetGlobalLocale(oldLocale);
@@ -76556,10 +76652,10 @@
 	    return _moment;
 
 	}));
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(444)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(446)(module)))
 
 /***/ },
-/* 444 */
+/* 446 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -76575,180 +76671,180 @@
 
 
 /***/ },
-/* 445 */
+/* 447 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var map = {
-		"./af": 446,
-		"./af.js": 446,
-		"./ar": 447,
-		"./ar-ma": 448,
-		"./ar-ma.js": 448,
-		"./ar-sa": 449,
-		"./ar-sa.js": 449,
-		"./ar-tn": 450,
-		"./ar-tn.js": 450,
-		"./ar.js": 447,
-		"./az": 451,
-		"./az.js": 451,
-		"./be": 452,
-		"./be.js": 452,
-		"./bg": 453,
-		"./bg.js": 453,
-		"./bn": 454,
-		"./bn.js": 454,
-		"./bo": 455,
-		"./bo.js": 455,
-		"./br": 456,
-		"./br.js": 456,
-		"./bs": 457,
-		"./bs.js": 457,
-		"./ca": 458,
-		"./ca.js": 458,
-		"./cs": 459,
-		"./cs.js": 459,
-		"./cv": 460,
-		"./cv.js": 460,
-		"./cy": 461,
-		"./cy.js": 461,
-		"./da": 462,
-		"./da.js": 462,
-		"./de": 463,
-		"./de-at": 464,
-		"./de-at.js": 464,
-		"./de.js": 463,
-		"./el": 465,
-		"./el.js": 465,
-		"./en-au": 466,
-		"./en-au.js": 466,
-		"./en-ca": 467,
-		"./en-ca.js": 467,
-		"./en-gb": 468,
-		"./en-gb.js": 468,
-		"./eo": 469,
-		"./eo.js": 469,
-		"./es": 470,
-		"./es.js": 470,
-		"./et": 471,
-		"./et.js": 471,
-		"./eu": 472,
-		"./eu.js": 472,
-		"./fa": 473,
-		"./fa.js": 473,
-		"./fi": 474,
-		"./fi.js": 474,
-		"./fo": 475,
-		"./fo.js": 475,
-		"./fr": 476,
-		"./fr-ca": 477,
-		"./fr-ca.js": 477,
-		"./fr.js": 476,
-		"./fy": 478,
-		"./fy.js": 478,
-		"./gl": 479,
-		"./gl.js": 479,
-		"./he": 480,
-		"./he.js": 480,
-		"./hi": 481,
-		"./hi.js": 481,
-		"./hr": 482,
-		"./hr.js": 482,
-		"./hu": 483,
-		"./hu.js": 483,
-		"./hy-am": 484,
-		"./hy-am.js": 484,
-		"./id": 485,
-		"./id.js": 485,
-		"./is": 486,
-		"./is.js": 486,
-		"./it": 487,
-		"./it.js": 487,
-		"./ja": 488,
-		"./ja.js": 488,
-		"./jv": 489,
-		"./jv.js": 489,
-		"./ka": 490,
-		"./ka.js": 490,
-		"./km": 491,
-		"./km.js": 491,
-		"./ko": 492,
-		"./ko.js": 492,
-		"./lb": 493,
-		"./lb.js": 493,
-		"./lt": 494,
-		"./lt.js": 494,
-		"./lv": 495,
-		"./lv.js": 495,
-		"./me": 496,
-		"./me.js": 496,
-		"./mk": 497,
-		"./mk.js": 497,
-		"./ml": 498,
-		"./ml.js": 498,
-		"./mr": 499,
-		"./mr.js": 499,
-		"./ms": 500,
-		"./ms-my": 501,
-		"./ms-my.js": 501,
-		"./ms.js": 500,
-		"./my": 502,
-		"./my.js": 502,
-		"./nb": 503,
-		"./nb.js": 503,
-		"./ne": 504,
-		"./ne.js": 504,
-		"./nl": 505,
-		"./nl.js": 505,
-		"./nn": 506,
-		"./nn.js": 506,
-		"./pl": 507,
-		"./pl.js": 507,
-		"./pt": 508,
-		"./pt-br": 509,
-		"./pt-br.js": 509,
-		"./pt.js": 508,
-		"./ro": 510,
-		"./ro.js": 510,
-		"./ru": 511,
-		"./ru.js": 511,
-		"./si": 512,
-		"./si.js": 512,
-		"./sk": 513,
-		"./sk.js": 513,
-		"./sl": 514,
-		"./sl.js": 514,
-		"./sq": 515,
-		"./sq.js": 515,
-		"./sr": 516,
-		"./sr-cyrl": 517,
-		"./sr-cyrl.js": 517,
-		"./sr.js": 516,
-		"./sv": 518,
-		"./sv.js": 518,
-		"./ta": 519,
-		"./ta.js": 519,
-		"./th": 520,
-		"./th.js": 520,
-		"./tl-ph": 521,
-		"./tl-ph.js": 521,
-		"./tr": 522,
-		"./tr.js": 522,
-		"./tzl": 523,
-		"./tzl.js": 523,
-		"./tzm": 524,
-		"./tzm-latn": 525,
-		"./tzm-latn.js": 525,
-		"./tzm.js": 524,
-		"./uk": 526,
-		"./uk.js": 526,
-		"./uz": 527,
-		"./uz.js": 527,
-		"./vi": 528,
-		"./vi.js": 528,
-		"./zh-cn": 529,
-		"./zh-cn.js": 529,
-		"./zh-tw": 530,
-		"./zh-tw.js": 530
+		"./af": 448,
+		"./af.js": 448,
+		"./ar": 449,
+		"./ar-ma": 450,
+		"./ar-ma.js": 450,
+		"./ar-sa": 451,
+		"./ar-sa.js": 451,
+		"./ar-tn": 452,
+		"./ar-tn.js": 452,
+		"./ar.js": 449,
+		"./az": 453,
+		"./az.js": 453,
+		"./be": 454,
+		"./be.js": 454,
+		"./bg": 455,
+		"./bg.js": 455,
+		"./bn": 456,
+		"./bn.js": 456,
+		"./bo": 457,
+		"./bo.js": 457,
+		"./br": 458,
+		"./br.js": 458,
+		"./bs": 459,
+		"./bs.js": 459,
+		"./ca": 460,
+		"./ca.js": 460,
+		"./cs": 461,
+		"./cs.js": 461,
+		"./cv": 462,
+		"./cv.js": 462,
+		"./cy": 463,
+		"./cy.js": 463,
+		"./da": 464,
+		"./da.js": 464,
+		"./de": 465,
+		"./de-at": 466,
+		"./de-at.js": 466,
+		"./de.js": 465,
+		"./el": 467,
+		"./el.js": 467,
+		"./en-au": 468,
+		"./en-au.js": 468,
+		"./en-ca": 469,
+		"./en-ca.js": 469,
+		"./en-gb": 470,
+		"./en-gb.js": 470,
+		"./eo": 471,
+		"./eo.js": 471,
+		"./es": 472,
+		"./es.js": 472,
+		"./et": 473,
+		"./et.js": 473,
+		"./eu": 474,
+		"./eu.js": 474,
+		"./fa": 475,
+		"./fa.js": 475,
+		"./fi": 476,
+		"./fi.js": 476,
+		"./fo": 477,
+		"./fo.js": 477,
+		"./fr": 478,
+		"./fr-ca": 479,
+		"./fr-ca.js": 479,
+		"./fr.js": 478,
+		"./fy": 480,
+		"./fy.js": 480,
+		"./gl": 481,
+		"./gl.js": 481,
+		"./he": 482,
+		"./he.js": 482,
+		"./hi": 483,
+		"./hi.js": 483,
+		"./hr": 484,
+		"./hr.js": 484,
+		"./hu": 485,
+		"./hu.js": 485,
+		"./hy-am": 486,
+		"./hy-am.js": 486,
+		"./id": 487,
+		"./id.js": 487,
+		"./is": 488,
+		"./is.js": 488,
+		"./it": 489,
+		"./it.js": 489,
+		"./ja": 490,
+		"./ja.js": 490,
+		"./jv": 491,
+		"./jv.js": 491,
+		"./ka": 492,
+		"./ka.js": 492,
+		"./km": 493,
+		"./km.js": 493,
+		"./ko": 494,
+		"./ko.js": 494,
+		"./lb": 495,
+		"./lb.js": 495,
+		"./lt": 496,
+		"./lt.js": 496,
+		"./lv": 497,
+		"./lv.js": 497,
+		"./me": 498,
+		"./me.js": 498,
+		"./mk": 499,
+		"./mk.js": 499,
+		"./ml": 500,
+		"./ml.js": 500,
+		"./mr": 501,
+		"./mr.js": 501,
+		"./ms": 502,
+		"./ms-my": 503,
+		"./ms-my.js": 503,
+		"./ms.js": 502,
+		"./my": 504,
+		"./my.js": 504,
+		"./nb": 505,
+		"./nb.js": 505,
+		"./ne": 506,
+		"./ne.js": 506,
+		"./nl": 507,
+		"./nl.js": 507,
+		"./nn": 508,
+		"./nn.js": 508,
+		"./pl": 509,
+		"./pl.js": 509,
+		"./pt": 510,
+		"./pt-br": 511,
+		"./pt-br.js": 511,
+		"./pt.js": 510,
+		"./ro": 512,
+		"./ro.js": 512,
+		"./ru": 513,
+		"./ru.js": 513,
+		"./si": 514,
+		"./si.js": 514,
+		"./sk": 515,
+		"./sk.js": 515,
+		"./sl": 516,
+		"./sl.js": 516,
+		"./sq": 517,
+		"./sq.js": 517,
+		"./sr": 518,
+		"./sr-cyrl": 519,
+		"./sr-cyrl.js": 519,
+		"./sr.js": 518,
+		"./sv": 520,
+		"./sv.js": 520,
+		"./ta": 521,
+		"./ta.js": 521,
+		"./th": 522,
+		"./th.js": 522,
+		"./tl-ph": 523,
+		"./tl-ph.js": 523,
+		"./tr": 524,
+		"./tr.js": 524,
+		"./tzl": 525,
+		"./tzl.js": 525,
+		"./tzm": 526,
+		"./tzm-latn": 527,
+		"./tzm-latn.js": 527,
+		"./tzm.js": 526,
+		"./uk": 528,
+		"./uk.js": 528,
+		"./uz": 529,
+		"./uz.js": 529,
+		"./vi": 530,
+		"./vi.js": 530,
+		"./zh-cn": 531,
+		"./zh-cn.js": 531,
+		"./zh-tw": 532,
+		"./zh-tw.js": 532
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -76761,11 +76857,11 @@
 	};
 	webpackContext.resolve = webpackContextResolve;
 	module.exports = webpackContext;
-	webpackContext.id = 445;
+	webpackContext.id = 447;
 
 
 /***/ },
-/* 446 */
+/* 448 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -76773,7 +76869,7 @@
 	//! author : Werner Mollentze : https://github.com/wernerm
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -76842,7 +76938,7 @@
 	}));
 
 /***/ },
-/* 447 */
+/* 449 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -76852,7 +76948,7 @@
 	//! Native plural forms: forabi https://github.com/forabi
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -76982,7 +77078,7 @@
 	}));
 
 /***/ },
-/* 448 */
+/* 450 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -76991,7 +77087,7 @@
 	//! author : Abdel Said : https://github.com/abdelsaid
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -77045,7 +77141,7 @@
 	}));
 
 /***/ },
-/* 449 */
+/* 451 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -77053,7 +77149,7 @@
 	//! author : Suhail Alkowaileet : https://github.com/xsoh
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -77152,14 +77248,14 @@
 	}));
 
 /***/ },
-/* 450 */
+/* 452 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
 	//! locale  : Tunisian Arabic (ar-tn)
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -77213,7 +77309,7 @@
 	}));
 
 /***/ },
-/* 451 */
+/* 453 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -77221,7 +77317,7 @@
 	//! author : topchiyev : https://github.com/topchiyev
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -77321,7 +77417,7 @@
 	}));
 
 /***/ },
-/* 452 */
+/* 454 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -77331,7 +77427,7 @@
 	//! Author : Menelion Elensúle : https://github.com/Oire
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -77472,7 +77568,7 @@
 	}));
 
 /***/ },
-/* 453 */
+/* 455 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -77480,7 +77576,7 @@
 	//! author : Krasen Borisov : https://github.com/kraz
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -77566,7 +77662,7 @@
 	}));
 
 /***/ },
-/* 454 */
+/* 456 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -77574,7 +77670,7 @@
 	//! author : Kaushik Gandhi : https://github.com/kaushikgandhi
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -77683,7 +77779,7 @@
 	}));
 
 /***/ },
-/* 455 */
+/* 457 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -77691,7 +77787,7 @@
 	//! author : Thupten N. Chakrishar : https://github.com/vajradog
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -77797,7 +77893,7 @@
 	}));
 
 /***/ },
-/* 456 */
+/* 458 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -77805,7 +77901,7 @@
 	//! author : Jean-Baptiste Le Duigou : https://github.com/jbleduigou
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -77908,7 +78004,7 @@
 	}));
 
 /***/ },
-/* 457 */
+/* 459 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -77917,7 +78013,7 @@
 	//! based on (hr) translation by Bojan Marković
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -78053,7 +78149,7 @@
 	}));
 
 /***/ },
-/* 458 */
+/* 460 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -78061,7 +78157,7 @@
 	//! author : Juan G. Hurtado : https://github.com/juanghurtado
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -78136,7 +78232,7 @@
 	}));
 
 /***/ },
-/* 459 */
+/* 461 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -78144,7 +78240,7 @@
 	//! author : petrbela : https://github.com/petrbela
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -78297,7 +78393,7 @@
 	}));
 
 /***/ },
-/* 460 */
+/* 462 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -78305,7 +78401,7 @@
 	//! author : Anatoly Mironov : https://github.com/mirontoli
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -78364,7 +78460,7 @@
 	}));
 
 /***/ },
-/* 461 */
+/* 463 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -78372,7 +78468,7 @@
 	//! author : Robert Allen
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -78447,7 +78543,7 @@
 	}));
 
 /***/ },
-/* 462 */
+/* 464 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -78455,7 +78551,7 @@
 	//! author : Ulrik Nielsen : https://github.com/mrbase
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -78511,7 +78607,7 @@
 	}));
 
 /***/ },
-/* 463 */
+/* 465 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -78520,7 +78616,7 @@
 	//! author: Menelion Elensúle: https://github.com/Oire
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -78590,7 +78686,7 @@
 	}));
 
 /***/ },
-/* 464 */
+/* 466 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -78600,7 +78696,7 @@
 	//! author : Martin Groller : https://github.com/MadMG
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -78670,7 +78766,7 @@
 	}));
 
 /***/ },
-/* 465 */
+/* 467 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -78678,7 +78774,7 @@
 	//! author : Aggelos Karalias : https://github.com/mehiel
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -78768,14 +78864,14 @@
 	}));
 
 /***/ },
-/* 466 */
+/* 468 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
 	//! locale : australian english (en-au)
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -78838,7 +78934,7 @@
 	}));
 
 /***/ },
-/* 467 */
+/* 469 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -78846,7 +78942,7 @@
 	//! author : Jonathan Abourbih : https://github.com/jonbca
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -78905,7 +79001,7 @@
 	}));
 
 /***/ },
-/* 468 */
+/* 470 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -78913,7 +79009,7 @@
 	//! author : Chris Gedrim : https://github.com/chrisgedrim
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -78976,7 +79072,7 @@
 	}));
 
 /***/ },
-/* 469 */
+/* 471 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -78986,7 +79082,7 @@
 	//!          Se ne, bonvolu korekti kaj avizi min por ke mi povas lerni!
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -79053,7 +79149,7 @@
 	}));
 
 /***/ },
-/* 470 */
+/* 472 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -79061,7 +79157,7 @@
 	//! author : Julio Napurí : https://github.com/julionc
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -79136,7 +79232,7 @@
 	}));
 
 /***/ },
-/* 471 */
+/* 473 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -79145,7 +79241,7 @@
 	//! improvements : Illimar Tambek : https://github.com/ragulka
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -79220,7 +79316,7 @@
 	}));
 
 /***/ },
-/* 472 */
+/* 474 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -79228,7 +79324,7 @@
 	//! author : Eneko Illarramendi : https://github.com/eillarra
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -79288,7 +79384,7 @@
 	}));
 
 /***/ },
-/* 473 */
+/* 475 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -79296,7 +79392,7 @@
 	//! author : Ebrahim Byagowi : https://github.com/ebraminio
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -79397,7 +79493,7 @@
 	}));
 
 /***/ },
-/* 474 */
+/* 476 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -79405,7 +79501,7 @@
 	//! author : Tarmo Aidantausta : https://github.com/bleadof
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -79508,7 +79604,7 @@
 	}));
 
 /***/ },
-/* 475 */
+/* 477 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -79516,7 +79612,7 @@
 	//! author : Ragnar Johannesen : https://github.com/ragnar123
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -79572,7 +79668,7 @@
 	}));
 
 /***/ },
-/* 476 */
+/* 478 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -79580,7 +79676,7 @@
 	//! author : John Fischer : https://github.com/jfroffice
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -79638,7 +79734,7 @@
 	}));
 
 /***/ },
-/* 477 */
+/* 479 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -79646,7 +79742,7 @@
 	//! author : Jonathan Abourbih : https://github.com/jonbca
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -79700,7 +79796,7 @@
 	}));
 
 /***/ },
-/* 478 */
+/* 480 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -79708,7 +79804,7 @@
 	//! author : Robin van der Vliet : https://github.com/robin0van0der0v
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -79775,7 +79871,7 @@
 	}));
 
 /***/ },
-/* 479 */
+/* 481 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -79783,7 +79879,7 @@
 	//! author : Juan G. Hurtado : https://github.com/juanghurtado
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -79854,7 +79950,7 @@
 	}));
 
 /***/ },
-/* 480 */
+/* 482 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -79864,7 +79960,7 @@
 	//! author : Tal Ater : https://github.com/TalAter
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -79940,7 +80036,7 @@
 	}));
 
 /***/ },
-/* 481 */
+/* 483 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -79948,7 +80044,7 @@
 	//! author : Mayank Singhal : https://github.com/mayanksinghal
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -80067,7 +80163,7 @@
 	}));
 
 /***/ },
-/* 482 */
+/* 484 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -80075,7 +80171,7 @@
 	//! author : Bojan Marković : https://github.com/bmarkovic
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -80211,7 +80307,7 @@
 	}));
 
 /***/ },
-/* 483 */
+/* 485 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -80219,7 +80315,7 @@
 	//! author : Adam Brunner : https://github.com/adambrunner
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -80324,7 +80420,7 @@
 	}));
 
 /***/ },
-/* 484 */
+/* 486 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -80332,7 +80428,7 @@
 	//! author : Armendarabyan : https://github.com/armendarabyan
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -80439,7 +80535,7 @@
 	}));
 
 /***/ },
-/* 485 */
+/* 487 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -80448,7 +80544,7 @@
 	//! reference: http://id.wikisource.org/wiki/Pedoman_Umum_Ejaan_Bahasa_Indonesia_yang_Disempurnakan
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -80526,7 +80622,7 @@
 	}));
 
 /***/ },
-/* 486 */
+/* 488 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -80534,7 +80630,7 @@
 	//! author : Hinrik Örn Sigurðsson : https://github.com/hinrik
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -80657,7 +80753,7 @@
 	}));
 
 /***/ },
-/* 487 */
+/* 489 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -80666,7 +80762,7 @@
 	//! author: Mattia Larentis: https://github.com/nostalgiaz
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -80731,7 +80827,7 @@
 	}));
 
 /***/ },
-/* 488 */
+/* 490 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -80739,7 +80835,7 @@
 	//! author : LI Long : https://github.com/baryon
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -80800,7 +80896,7 @@
 	}));
 
 /***/ },
-/* 489 */
+/* 491 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -80809,7 +80905,7 @@
 	//! reference: http://jv.wikipedia.org/wiki/Basa_Jawa
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -80887,7 +80983,7 @@
 	}));
 
 /***/ },
-/* 490 */
+/* 492 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -80895,7 +80991,7 @@
 	//! author : Irakli Janiashvili : https://github.com/irakli-janiashvili
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -80994,7 +81090,7 @@
 	}));
 
 /***/ },
-/* 491 */
+/* 493 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -81002,7 +81098,7 @@
 	//! author : Kruy Vanna : https://github.com/kruyvanna
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -81056,7 +81152,7 @@
 	}));
 
 /***/ },
-/* 492 */
+/* 494 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -81068,7 +81164,7 @@
 	//! - Jeeeyul Lee <jeeeyul@gmail.com>
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -81128,7 +81224,7 @@
 	}));
 
 /***/ },
-/* 493 */
+/* 495 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -81136,7 +81232,7 @@
 	//! author : mweimerskirch : https://github.com/mweimerskirch, David Raison : https://github.com/kwisatz
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -81266,7 +81362,7 @@
 	}));
 
 /***/ },
-/* 494 */
+/* 496 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -81274,7 +81370,7 @@
 	//! author : Mindaugas Mozūras : https://github.com/mmozuras
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -81395,7 +81491,7 @@
 	}));
 
 /***/ },
-/* 495 */
+/* 497 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -81404,7 +81500,7 @@
 	//! author : Jānis Elmeris : https://github.com/JanisE
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -81495,7 +81591,7 @@
 	}));
 
 /***/ },
-/* 496 */
+/* 498 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -81503,7 +81599,7 @@
 	//! author : Miodrag Nikač <miodrag@restartit.me> : https://github.com/miodragnikac
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -81608,7 +81704,7 @@
 	}));
 
 /***/ },
-/* 497 */
+/* 499 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -81616,7 +81712,7 @@
 	//! author : Borislav Mickov : https://github.com/B0k0
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -81702,7 +81798,7 @@
 	}));
 
 /***/ },
-/* 498 */
+/* 500 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -81710,7 +81806,7 @@
 	//! author : Floyd Pink : https://github.com/floydpink
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -81777,7 +81873,7 @@
 	}));
 
 /***/ },
-/* 499 */
+/* 501 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -81785,7 +81881,7 @@
 	//! author : Harshad Kale : https://github.com/kalehv
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -81902,7 +81998,7 @@
 	}));
 
 /***/ },
-/* 500 */
+/* 502 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -81910,7 +82006,7 @@
 	//! author : Weldan Jamili : https://github.com/weldan
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -81988,7 +82084,7 @@
 	}));
 
 /***/ },
-/* 501 */
+/* 503 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -81996,7 +82092,7 @@
 	//! author : Weldan Jamili : https://github.com/weldan
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -82074,7 +82170,7 @@
 	}));
 
 /***/ },
-/* 502 */
+/* 504 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -82082,7 +82178,7 @@
 	//! author : Squar team, mysquar.com
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -82171,7 +82267,7 @@
 	}));
 
 /***/ },
-/* 503 */
+/* 505 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -82180,7 +82276,7 @@
 	//!           Sigurd Gartmann : https://github.com/sigurdga
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -82236,7 +82332,7 @@
 	}));
 
 /***/ },
-/* 504 */
+/* 506 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -82244,7 +82340,7 @@
 	//! author : suvash : https://github.com/suvash
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -82363,7 +82459,7 @@
 	}));
 
 /***/ },
-/* 505 */
+/* 507 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -82371,7 +82467,7 @@
 	//! author : Joris Röling : https://github.com/jjupiter
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -82438,7 +82534,7 @@
 	}));
 
 /***/ },
-/* 506 */
+/* 508 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -82446,7 +82542,7 @@
 	//! author : https://github.com/mechuwind
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -82502,7 +82598,7 @@
 	}));
 
 /***/ },
-/* 507 */
+/* 509 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -82510,7 +82606,7 @@
 	//! author : Rafal Hirsz : https://github.com/evoL
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -82611,7 +82707,7 @@
 	}));
 
 /***/ },
-/* 508 */
+/* 510 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -82619,7 +82715,7 @@
 	//! author : Jefferson : https://github.com/jalex79
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -82679,7 +82775,7 @@
 	}));
 
 /***/ },
-/* 509 */
+/* 511 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -82687,7 +82783,7 @@
 	//! author : Caio Ribeiro Pereira : https://github.com/caio-ribeiro-pereira
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -82743,7 +82839,7 @@
 	}));
 
 /***/ },
-/* 510 */
+/* 512 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -82752,7 +82848,7 @@
 	//! author : Valentin Agachi : https://github.com/avaly
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -82821,7 +82917,7 @@
 	}));
 
 /***/ },
-/* 511 */
+/* 513 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -82830,7 +82926,7 @@
 	//! Author : Menelion Elensúle : https://github.com/Oire
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -82989,7 +83085,7 @@
 	}));
 
 /***/ },
-/* 512 */
+/* 514 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -82997,7 +83093,7 @@
 	//! author : Sampath Sitinamaluwa : https://github.com/sampathsris
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -83058,7 +83154,7 @@
 	}));
 
 /***/ },
-/* 513 */
+/* 515 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -83067,7 +83163,7 @@
 	//! based on work of petrbela : https://github.com/petrbela
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -83220,7 +83316,7 @@
 	}));
 
 /***/ },
-/* 514 */
+/* 516 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -83228,7 +83324,7 @@
 	//! author : Robert Sedovšek : https://github.com/sedovsek
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -83384,7 +83480,7 @@
 	}));
 
 /***/ },
-/* 515 */
+/* 517 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -83394,7 +83490,7 @@
 	//! author : Oerd Cukalla : https://github.com/oerd (fixes)
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -83457,7 +83553,7 @@
 	}));
 
 /***/ },
-/* 516 */
+/* 518 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -83465,7 +83561,7 @@
 	//! author : Milan Janačković<milanjanackovic@gmail.com> : https://github.com/milan-j
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -83569,7 +83665,7 @@
 	}));
 
 /***/ },
-/* 517 */
+/* 519 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -83577,7 +83673,7 @@
 	//! author : Milan Janačković<milanjanackovic@gmail.com> : https://github.com/milan-j
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -83681,7 +83777,7 @@
 	}));
 
 /***/ },
-/* 518 */
+/* 520 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -83689,7 +83785,7 @@
 	//! author : Jens Alm : https://github.com/ulmus
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -83752,7 +83848,7 @@
 	}));
 
 /***/ },
-/* 519 */
+/* 521 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -83760,7 +83856,7 @@
 	//! author : Arjunkumar Krishnamoorthy : https://github.com/tk120404
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -83851,7 +83947,7 @@
 	}));
 
 /***/ },
-/* 520 */
+/* 522 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -83859,7 +83955,7 @@
 	//! author : Kridsada Thanabulpong : https://github.com/sirn
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -83920,7 +84016,7 @@
 	}));
 
 /***/ },
-/* 521 */
+/* 523 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -83928,7 +84024,7 @@
 	//! author : Dan Hagman
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -83986,7 +84082,7 @@
 	}));
 
 /***/ },
-/* 522 */
+/* 524 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -83995,7 +84091,7 @@
 	//!           Burak Yiğit Kaya: https://github.com/BYK
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -84080,7 +84176,7 @@
 	}));
 
 /***/ },
-/* 523 */
+/* 525 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -84088,7 +84184,7 @@
 	//! author : Robin van der Vliet : https://github.com/robin0van0der0v with the help of Iustì Canun
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -84169,7 +84265,7 @@
 	}));
 
 /***/ },
-/* 524 */
+/* 526 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -84177,7 +84273,7 @@
 	//! author : Abdel Said : https://github.com/abdelsaid
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -84231,7 +84327,7 @@
 	}));
 
 /***/ },
-/* 525 */
+/* 527 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -84239,7 +84335,7 @@
 	//! author : Abdel Said : https://github.com/abdelsaid
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -84293,7 +84389,7 @@
 	}));
 
 /***/ },
-/* 526 */
+/* 528 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -84302,7 +84398,7 @@
 	//! Author : Menelion Elensúle : https://github.com/Oire
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -84450,7 +84546,7 @@
 	}));
 
 /***/ },
-/* 527 */
+/* 529 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -84458,7 +84554,7 @@
 	//! author : Sardor Muminov : https://github.com/muminoff
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -84512,7 +84608,7 @@
 	}));
 
 /***/ },
-/* 528 */
+/* 530 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -84520,7 +84616,7 @@
 	//! author : Bang Nguyen : https://github.com/bangnk
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -84582,7 +84678,7 @@
 	}));
 
 /***/ },
-/* 529 */
+/* 531 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -84591,7 +84687,7 @@
 	//! author : Zeno Zeng : https://github.com/zenozeng
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -84713,7 +84809,7 @@
 	}));
 
 /***/ },
-/* 530 */
+/* 532 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//! moment.js locale configuration
@@ -84721,7 +84817,7 @@
 	//! author : Ben : https://github.com/ben-lin
 
 	(function (global, factory) {
-	    true ? factory(__webpack_require__(443)) :
+	    true ? factory(__webpack_require__(445)) :
 	   typeof define === 'function' && define.amd ? define(['moment'], factory) :
 	   factory(global.moment)
 	}(this, function (moment) { 'use strict';
@@ -84818,7 +84914,7 @@
 	}));
 
 /***/ },
-/* 531 */
+/* 533 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -84829,18 +84925,18 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var ChartBase = __webpack_require__(393);
+	    var ChartBase = __webpack_require__(395);
 	    
 	    // 图形依赖
-	    var PolylineShape = __webpack_require__(409);
-	    var IconShape = __webpack_require__(394);
-	    var HalfSmoothPolygonShape = __webpack_require__(534);
+	    var PolylineShape = __webpack_require__(411);
+	    var IconShape = __webpack_require__(396);
+	    var HalfSmoothPolygonShape = __webpack_require__(536);
 	    // 组件依赖
-	    __webpack_require__(535);
-	    __webpack_require__(540);
-	    __webpack_require__(532);
+	    __webpack_require__(537);
+	    __webpack_require__(542);
+	    __webpack_require__(534);
 	    
-	    var ecConfig = __webpack_require__(363);
+	    var ecConfig = __webpack_require__(365);
 	    // 折线图默认参数
 	    ecConfig.line = {
 	        zlevel: 0,                  // 一级层叠
@@ -84889,9 +84985,9 @@
 	        showAllSymbol: false     // 标志图形默认只有主轴显示（随主轴标签间隔隐藏策略）
 	    };
 
-	    var ecData = __webpack_require__(411);
-	    var zrUtil = __webpack_require__(364);
-	    var zrColor = __webpack_require__(383);
+	    var ecData = __webpack_require__(413);
+	    var zrUtil = __webpack_require__(366);
+	    var zrColor = __webpack_require__(385);
 	    
 	    /**
 	     * 构造函数
@@ -85875,13 +85971,13 @@
 	    zrUtil.inherits(Line, ChartBase);
 	    
 	    // 图表注册
-	    __webpack_require__(362).define('line', Line);
+	    __webpack_require__(364).define('line', Line);
 	    
 	    return Line;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 532 */
+/* 534 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -85892,14 +85988,14 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(416);
+	    var Base = __webpack_require__(418);
 
 	    // 图形依赖
-	    var RectangleShape = __webpack_require__(384);
-	    var PolygonShape = __webpack_require__(405);
-	    var IconShape = __webpack_require__(394);
+	    var RectangleShape = __webpack_require__(386);
+	    var PolygonShape = __webpack_require__(407);
+	    var IconShape = __webpack_require__(396);
 
-	    var ecConfig = __webpack_require__(363);
+	    var ecConfig = __webpack_require__(365);
 	    // 区域缩放控制器
 	    ecConfig.dataZoom = {
 	        zlevel: 0,                  // 一级层叠
@@ -85927,8 +86023,8 @@
 	        // zoomLock: false         // 是否锁定选择区域大小
 	    };
 
-	    var ecDate = __webpack_require__(533);
-	    var zrUtil = __webpack_require__(364);
+	    var ecDate = __webpack_require__(535);
+	    var zrUtil = __webpack_require__(366);
 
 	    /**
 	     * 构造函数
@@ -86200,7 +86296,7 @@
 	        _calculScatterMap : function (seriesIndex) {
 	            this._zoom.scatterMap = this._zoom.scatterMap || {};
 	            this._zoom.scatterMap[seriesIndex] = this._zoom.scatterMap[seriesIndex] || {};
-	            var componentLibrary = __webpack_require__(424);
+	            var componentLibrary = __webpack_require__(426);
 	            // x轴极值
 	            var Axis = componentLibrary.get('axis');
 	            var axisOption = zrUtil.clone(this.option.xAxis);
@@ -87124,14 +87220,14 @@
 
 	    zrUtil.inherits(DataZoom, Base);
 
-	    __webpack_require__(424).define('dataZoom', DataZoom);
+	    __webpack_require__(426).define('dataZoom', DataZoom);
 
 	    return DataZoom;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 533 */
+/* 535 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -87298,7 +87394,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 534 */
+/* 536 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -87348,9 +87444,9 @@
 	   }
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(381);
-	    var smoothBezier = __webpack_require__(407);
-	    var zrUtil = __webpack_require__(364);
+	    var Base = __webpack_require__(383);
+	    var smoothBezier = __webpack_require__(409);
+	    var zrUtil = __webpack_require__(366);
 	    
 	    function HalfSmoothPolygon(options) {
 	        Base.call(this, options);
@@ -87392,7 +87488,7 @@
 	                ctx.lineTo(pointList[0][0], pointList[0][1]);
 	            } 
 	            else {
-	                __webpack_require__(405).prototype.buildPath(
+	                __webpack_require__(407).prototype.buildPath(
 	                    ctx, style
 	                );
 	            }
@@ -87406,7 +87502,7 @@
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 535 */
+/* 537 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -87425,14 +87521,14 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(416);
+	    var Base = __webpack_require__(418);
 
-	    var LineShape = __webpack_require__(401);
+	    var LineShape = __webpack_require__(403);
 
-	    var ecConfig = __webpack_require__(363);
-	    var ecData = __webpack_require__(411);
-	    var zrUtil = __webpack_require__(364);
-	    var zrColor = __webpack_require__(383);
+	    var ecConfig = __webpack_require__(365);
+	    var ecData = __webpack_require__(413);
+	    var zrUtil = __webpack_require__(366);
+	    var zrColor = __webpack_require__(385);
 
 	    /**
 	     * 构造函数
@@ -87695,8 +87791,8 @@
 	                this.series = newOption.series;
 	            }
 
-	            var CategoryAxis = __webpack_require__(536);
-	            var ValueAxis = __webpack_require__(537);
+	            var CategoryAxis = __webpack_require__(538);
+	            var ValueAxis = __webpack_require__(539);
 	            var len = Math.max((axisOption && axisOption.length || 0), this._axisList.length);
 	            for (var i = 0; i < len; i++) {
 	                if (this._axisList[i]   // 已有实例
@@ -87750,14 +87846,14 @@
 
 	    zrUtil.inherits(Axis, Base);
 
-	    __webpack_require__(424).define('axis', Axis);
+	    __webpack_require__(426).define('axis', Axis);
 
 	    return Axis;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 536 */
+/* 538 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -87768,14 +87864,14 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(416);
+	    var Base = __webpack_require__(418);
 	    
 	    // 图形依赖
-	    var TextShape = __webpack_require__(378);
-	    var LineShape = __webpack_require__(401);
-	    var RectangleShape = __webpack_require__(384);
+	    var TextShape = __webpack_require__(380);
+	    var LineShape = __webpack_require__(403);
+	    var RectangleShape = __webpack_require__(386);
 	    
-	    var ecConfig = __webpack_require__(363);
+	    var ecConfig = __webpack_require__(365);
 	    // 类目轴
 	    ecConfig.categoryAxis =  {
 	        zlevel: 0,                  // 一级层叠
@@ -87835,8 +87931,8 @@
 	        }
 	    };
 
-	    var zrUtil = __webpack_require__(364);
-	    var zrArea = __webpack_require__(379);
+	    var zrUtil = __webpack_require__(366);
+	    var zrArea = __webpack_require__(381);
 	    
 	    /**
 	     * 构造函数
@@ -88560,13 +88656,13 @@
 	    
 	    zrUtil.inherits(CategoryAxis, Base);
 	    
-	    __webpack_require__(424).define('categoryAxis', CategoryAxis);
+	    __webpack_require__(426).define('categoryAxis', CategoryAxis);
 	    
 	    return CategoryAxis;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 537 */
+/* 539 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -88577,14 +88673,14 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(416);
+	    var Base = __webpack_require__(418);
 
 	    // 图形依赖
-	    var TextShape = __webpack_require__(378);
-	    var LineShape = __webpack_require__(401);
-	    var RectangleShape = __webpack_require__(384);
+	    var TextShape = __webpack_require__(380);
+	    var LineShape = __webpack_require__(403);
+	    var RectangleShape = __webpack_require__(386);
 
-	    var ecConfig = __webpack_require__(363);
+	    var ecConfig = __webpack_require__(365);
 	    // 数值型坐标轴默认参数
 	    ecConfig.valueAxis = {
 	        zlevel: 0,                  // 一级层叠
@@ -88643,8 +88739,8 @@
 	        }
 	    };
 
-	    var ecDate = __webpack_require__(533);
-	    var zrUtil = __webpack_require__(364);
+	    var ecDate = __webpack_require__(535);
+	    var zrUtil = __webpack_require__(366);
 
 	    /**
 	     * 构造函数
@@ -89235,7 +89331,7 @@
 	         * by Kener 2014-11-6
 	         */
 	        _reformValue: function (scale) {
-	            var smartSteps = __webpack_require__(538);
+	            var smartSteps = __webpack_require__(540);
 	            var splitNumber = this.option.splitNumber;
 
 	            // 非scale下双正，修正最小值为0
@@ -89331,7 +89427,7 @@
 	        },
 
 	        _customerValue: function () {
-	            var accMath = __webpack_require__(415);
+	            var accMath = __webpack_require__(417);
 	            var splitNumber = this.option.splitNumber != null ? this.option.splitNumber : 5;
 	            var splitGap = (this._max - this._min) / splitNumber;
 
@@ -89345,7 +89441,7 @@
 	        _reformLogValue: function() {
 	            // log数轴本质就是缩放，相当于默认this.option.scale === true，所以不修正_min和_max到0。
 	            var thisOption = this.option;
-	            var result = __webpack_require__(539)({
+	            var result = __webpack_require__(541)({
 	                dataMin: this._min,
 	                dataMax: this._max,
 	                logPositive: thisOption.logPositive,
@@ -89512,7 +89608,7 @@
 
 	    zrUtil.inherits(ValueAxis, Base);
 
-	    __webpack_require__(424).define('valueAxis', ValueAxis);
+	    __webpack_require__(426).define('valueAxis', ValueAxis);
 
 	    return ValueAxis;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -89520,7 +89616,7 @@
 
 
 /***/ },
-/* 538 */
+/* 540 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;
@@ -90070,7 +90166,7 @@
 
 
 /***/ },
-/* 539 */
+/* 541 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -90083,7 +90179,7 @@
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
 	    // Reference
-	    var number = __webpack_require__(417);
+	    var number = __webpack_require__(419);
 	    var Mt = Math;
 	    var mathLog = Mt.log;
 	    var mathPow = Mt.pow;
@@ -90531,7 +90627,7 @@
 
 
 /***/ },
-/* 540 */
+/* 542 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -90542,12 +90638,12 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var Base = __webpack_require__(416);
+	    var Base = __webpack_require__(418);
 	    
 	    // 图形依赖
-	    var RectangleShape = __webpack_require__(384);
+	    var RectangleShape = __webpack_require__(386);
 	    
-	    var ecConfig = __webpack_require__(363);
+	    var ecConfig = __webpack_require__(365);
 	    // 网格
 	    ecConfig.grid = {
 	        zlevel: 0,                  // 一级层叠
@@ -90563,7 +90659,7 @@
 	        borderColor: '#ccc'
 	    };
 
-	    var zrUtil = __webpack_require__(364);
+	    var zrUtil = __webpack_require__(366);
 
 	    /**
 	     * 构造函数
@@ -90714,13 +90810,13 @@
 	    
 	    zrUtil.inherits(Grid, Base);
 	    
-	    __webpack_require__(424).define('grid', Grid);
+	    __webpack_require__(426).define('grid', Grid);
 	    
 	    return Grid;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 541 */
+/* 543 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -90731,16 +90827,16 @@
 	 *
 	 */
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var ChartBase = __webpack_require__(393);
+	    var ChartBase = __webpack_require__(395);
 	    
 	    // 图形依赖
-	    var RectangleShape = __webpack_require__(384);
+	    var RectangleShape = __webpack_require__(386);
 	    // 组件依赖
-	    __webpack_require__(535);
-	    __webpack_require__(540);
-	    __webpack_require__(532);
+	    __webpack_require__(537);
+	    __webpack_require__(542);
+	    __webpack_require__(534);
 	    
-	    var ecConfig = __webpack_require__(363);
+	    var ecConfig = __webpack_require__(365);
 	    // 柱形图默认参数
 	    ecConfig.bar = {
 	        zlevel: 0,                  // 一级层叠
@@ -90784,9 +90880,9 @@
 	        }
 	    };
 
-	    var ecData = __webpack_require__(411);
-	    var zrUtil = __webpack_require__(364);
-	    var zrColor = __webpack_require__(383);
+	    var ecData = __webpack_require__(413);
+	    var zrUtil = __webpack_require__(366);
+	    var zrColor = __webpack_require__(385);
 	    
 	    /**
 	     * 构造函数
@@ -91672,13 +91768,13 @@
 	    zrUtil.inherits(Bar, ChartBase);
 	    
 	    // 图表注册
-	    __webpack_require__(362).define('bar', Bar);
+	    __webpack_require__(364).define('bar', Bar);
 	    
 	    return Bar;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 542 */
+/* 544 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -91734,18 +91830,18 @@
 	module.exports = ButtonSelects;
 
 /***/ },
-/* 543 */
+/* 545 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(5);
-	var Echarts = __webpack_require__(360);
-	var apiAddress = __webpack_require__(357).apiAddress;
-	var pagesData = __webpack_require__(357).pages;
-	var moment = __webpack_require__(443);
-	__webpack_require__(531);
-	__webpack_require__(541);
+	var Echarts = __webpack_require__(362);
+	var apiAddress = __webpack_require__(358).apiAddress;
+	var pagesData = __webpack_require__(358).pages;
+	var moment = __webpack_require__(445);
+	__webpack_require__(533);
+	__webpack_require__(543);
 
 	module.exports = React.createClass({
 	  displayName: 'exports',
@@ -91860,7 +91956,7 @@
 	        chartData.push({
 	          name: ['一天', '一周', '一月', '三月'][config.contrastSelectIndex] + '前',
 	          keys: kv2.keys.map(function (item) {
-	            return moment(item * 1000).format('MM-DD hh');
+	            return moment(item * 1000).format('MM-DD HH:mm');
 	          }),
 	          values: kv2.values.map(function (item) {
 	            return item;
@@ -91903,7 +91999,7 @@
 	});
 
 /***/ },
-/* 544 */
+/* 546 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function injectTapEventPlugin () {
@@ -91911,14 +92007,14 @@
 	  React.initializeTouchEvents(true);
 
 	  __webpack_require__(72).injection.injectEventPluginsByName({
-	    "ResponderEventPlugin": __webpack_require__(545),
-	    "TapEventPlugin":       __webpack_require__(546)
+	    "ResponderEventPlugin": __webpack_require__(547),
+	    "TapEventPlugin":       __webpack_require__(548)
 	  });
 	};
 
 
 /***/ },
-/* 545 */
+/* 547 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -92233,7 +92329,7 @@
 
 
 /***/ },
-/* 546 */
+/* 548 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -92261,7 +92357,7 @@
 	var EventPluginUtils = __webpack_require__(8);
 	var EventPropagators = __webpack_require__(96);
 	var SyntheticUIEvent = __webpack_require__(109);
-	var TouchEventUtils = __webpack_require__(547);
+	var TouchEventUtils = __webpack_require__(549);
 	var ViewportMetrics = __webpack_require__(77);
 
 	var keyOf = __webpack_require__(42);
@@ -92405,7 +92501,7 @@
 
 
 /***/ },
-/* 547 */
+/* 549 */
 /***/ function(module, exports) {
 
 	/**
