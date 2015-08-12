@@ -17,8 +17,10 @@ module.exports = React.createClass({
           method: item.method,
           URL: item.url,
           QPS: null,
+          QPScontrast: null,
           QPStrend: null,
           RT: null,
+          RTcontrast: null,
           RTtrend: null
         };
       })
@@ -28,6 +30,9 @@ module.exports = React.createClass({
     let rowData = JSON.parse(JSON.stringify(this.state.rowData));
 
     rowData.forEach(function (item) {
+      item.QPStrend = ((1 - item.QPScontrast/item.QPS) * 100).toFixed(2);
+      item.RTtrend = ((1 - item.RTcontrast/item.RT) * 100).toFixed(2);
+
       Object.keys(item).forEach(function (k) {
         if (k == 'feature') {
           item[k] = {
@@ -50,11 +55,11 @@ module.exports = React.createClass({
               content: item[k]
             };
           }
-          
         }
       });
-     
-    })
+
+    });
+
 
     hack.wrapNum(rowData);
 
@@ -134,25 +139,35 @@ module.exports = React.createClass({
       tags:{service: service, method: method}
     };
 
-    $.get(apiAddress + '/monitor/pull',
+    let p1 = $.get(apiAddress + '/monitor/pull',
       {
         query: JSON.stringify(requestOption)
-      })
-    .then(function (res) {
-      let result = res.result;
-      let rowData = this.state.rowData;
-      let rowItemData = rowData[index];
+      });
 
-      try {
-        rowData[index].QPS = parseInt(result[0].dps[Object.keys(result[0].dps)[0]]/60);
-        rowData[index].RT = parseInt(result[1].dps[Object.keys(result[1].dps)[0]]);
-        this.setState({
-          rowData: rowData
-        });
-      } catch(e) {
-        console.error(e);
-      }
-      
-    }.bind(this));
+    requestOption.stime -= 60;
+    requestOption.etime -= 60;
+    let p2 = $.get(apiAddress + '/monitor/pull',
+      {
+        query: JSON.stringify(requestOption)
+      });
+
+    $.when(p1, p2)
+      .then(function (res1, res2) {
+        let result1 = res1[0].result;
+        let result2 = res2[0].result;
+        let rowData = this.state.rowData;
+        let rowItemData = rowData[index];
+        try {
+          rowData[index].QPS = parseInt(result1[0].dps[Object.keys(result1[0].dps)[0]]/60);
+          rowData[index].RT = parseInt(result1[1].dps[Object.keys(result1[1].dps)[0]]);
+          rowData[index].QPScontrast = parseInt(result2[0].dps[Object.keys(result2[0].dps)[0]]/60);
+          rowData[index].RTcontrast = parseInt(result2[1].dps[Object.keys(result2[1].dps)[0]]);
+          this.setState({
+            rowData: rowData
+          });
+        } catch(e) {
+          console.error(e);
+        }
+      }.bind(this));
   }
 });
