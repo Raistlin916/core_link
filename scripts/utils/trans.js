@@ -1,5 +1,5 @@
 var fs = require('fs');
-var s = fs.readFileSync('./testdata').toString();
+var s = fs.readFileSync('./meta').toString();
 
 s = s.split('\n');
 
