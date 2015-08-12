@@ -6,6 +6,47 @@ let Link = require('react-router').Link;
 let pagesData = require('../config').pages;
 let apiAddress = require('../config').apiAddress;
 
+// Column configuration
+let headerCols = {
+  core: {
+    content: '核心链路'
+  },
+  feature: {
+    content: '功能点'
+  },
+  URL: {
+    content: 'URL',
+    style: {
+      width: '350px'
+    }
+  },
+  QPS: {
+    content: 'QPS'
+  },
+  QPStrend: {
+    content: '趋势'
+  },
+  RT: {
+    content: 'RT'
+  },
+  RTtrend: {
+    content: '趋势'
+  }
+};
+let colOrder = ['core', 'feature', 'URL', 'QPS', 'QPStrend', 'RT', 'RTtrend'];
+let tableConfig = {
+  fixedHeader: true,
+  stripedRows: false,
+  showRowHover: true,
+  selectable: true,
+  multiSelectable: false,
+  deselectOnClickaway: true,
+  displayRowCheckbox: false,
+  displaySelectAll: false,
+  height: '600px',
+};
+
+
 module.exports = React.createClass({
   getInitialState: function () {
     return {
@@ -18,10 +59,8 @@ module.exports = React.createClass({
           URL: item.url,
           QPS: null,
           QPScontrast: null,
-          QPStrend: null,
           RT: null,
-          RTcontrast: null,
-          RTtrend: null
+          RTcontrast: null
         };
       })
     }
@@ -47,7 +86,7 @@ module.exports = React.createClass({
             item[k] = {
               content: item[k],
               style: {
-                width: '200px'
+                width: '350px'
               }
             };
           } else {
@@ -63,62 +102,25 @@ module.exports = React.createClass({
 
     hack.wrapNum(rowData);
 
-    let data = {
-      fixedHeader: true,
-      stripedRows: false,
-      showRowHover: true,
-      selectable: true,
-      multiSelectable: false,
-      deselectOnClickaway: true,
-      displayRowCheckbox: false,
-      displaySelectAll: false,
-      height: '600px',
-      rowData: rowData
-    };
-
-    // Column configuration
-    let headerCols = {
-      core: {
-        content: '核心链路'
-      },
-      feature: {
-        content: '功能点'
-      },
-      URL: {
-        content: 'URL',
-        style: {
-          width: '200px'
-        }
-      },
-      QPS: {
-        content: 'QPS'
-      },
-      QPStrend: {
-        content: '趋势'
-      },
-      RT: {
-        content: 'RT'
-      },
-      RTtrend: {
-        content: '趋势'
-      }
-    };
-    let colOrder = ['core', 'feature', 'URL', 'QPS', 'QPStrend', 'RT', 'RTtrend'];
-
     return (
         <Table
         headerColumns={headerCols}
         columnOrder={colOrder}
-        {...data} />
+        rowData={rowData}
+        {...tableConfig} />
       )
   },
 
   componentDidMount: function () {
-    setInterval(function () {
+    this.interval = setInterval(function () {
       this.updateAllRow();
-    }.bind(this), 1000 * 60);
+    }.bind(this), 1000 * 30);
 
     this.updateAllRow();
+  },
+
+  componentWillUnmount: function () {
+    clearInterval(this.interval);
   },
 
   updateAllRow: function () {
