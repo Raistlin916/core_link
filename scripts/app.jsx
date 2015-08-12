@@ -58,7 +58,7 @@ let App = React.createClass({
     };
 
     var mainStyle = {
-      width: '1000px',
+      width: '1200px',
       margin: '40px auto'
     };
     return (

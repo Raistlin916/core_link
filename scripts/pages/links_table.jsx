@@ -5,6 +5,7 @@ let hack = require('../utils/hack');
 let Link = require('react-router').Link;
 let pagesData = require('../config').pages;
 let apiAddress = require('../config').apiAddress;
+let ArrowSpan = require('../components/arrow_span');
 
 // Column configuration
 let headerCols = {
@@ -17,7 +18,7 @@ let headerCols = {
   URL: {
     content: 'URL',
     style: {
-      width: '350px'
+      width: '300px'
     }
   },
   QPS: {
@@ -45,34 +46,6 @@ let tableConfig = {
   displaySelectAll: false,
   height: '600px',
 };
-
-var ArrowSpan = React.createClass({
-  render: function() {
-    var value = this.props.data,
-        addClass = null,
-        arrow = null;
-    if(!isNaN(value)){
-        if(value < 0){
-            addClass = {
-              color: '#c10000',
-              paddingRight: '12px'
-            };
-            arrow = '↓';
-            value += arrow;
-        }else{
-            addClass = {
-              color: '#03b401',
-              paddingRight: '12px'
-            };
-            arrow = '↑';
-            value += arrow;
-        }
-    }
-    return (
-     <span style={addClass}>{value}</span>
-    )
-  }  
-});
 
 
 module.exports = React.createClass({
@@ -114,14 +87,18 @@ module.exports = React.createClass({
             item[k] = {
               content: item[k],
               style: {
-                width: '350px'
+                width: '300px'
               }
+            };
+          } else if (k == 'QPStrend' || k == 'RTtrend') {
+            item[k] = {
+              content: <ArrowSpan data={item[k]} />
             };
           } else {
             item[k] = {
               content: item[k]
             };
-          }
+          };
         }
       });
 
