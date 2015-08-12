@@ -9,10 +9,16 @@ let TableMixin = require('./table_mixin');
 // Column configuration
 let headerCols = {
   core: {
-    content: '核心链路'
+    content: '核心链路',
+    style: {
+      width: '50px'
+    }
   },
   feature: {
-    content: '功能点'
+    content: '功能点',
+    style: {
+      width: '150px'
+    }
   },
   URL: {
     content: 'URL',
@@ -61,30 +67,39 @@ module.exports = React.createClass({
       Object.keys(item).forEach(function (k) {
         if (k == 'feature') {
           item[k] = {
-            content: <Link to="detail" params={{id: 'chart'}}>{item[k]}</Link>
+            content: <Link to="detail" params={{id: 'chart'}}>{item[k]}</Link>,
+            style: {
+              width: '150px'
+            }
+          };
+        } else if (k == 'QPS' || k == 'RT') {
+          item[k] = {
+            content: item[k] == null ? <span>null</span> : item[k]
+          };
+        } else if(k == 'URL') {
+          item[k] = {
+            content: item[k],
+            style: {
+              width: '300px'
+            }
+          };
+        } else if (k == 'QPStrend' || k == 'RTtrend') {
+          item[k] = {
+            content: <ArrowSpan data={item[k]} />
+          };
+        } else if (k == 'core') {
+          item[k] = {
+            content: item[k],
+            style: {
+              width: '50px'
+            }
           };
         } else {
-          if (k == 'QPS' || k == 'RT') {
-            item[k] = {
-              content: item[k] == null ? <span>null</span> : item[k]
-            };
-          } else if(k == 'URL') {
-            item[k] = {
-              content: item[k],
-              style: {
-                width: '300px'
-              }
-            };
-          } else if (k == 'QPStrend' || k == 'RTtrend') {
-            item[k] = {
-              content: <ArrowSpan data={item[k]} />
-            };
-          } else {
-            item[k] = {
-              content: item[k]
-            };
+          item[k] = {
+            content: item[k]
           };
-        }
+        };
+
       });
 
     });
