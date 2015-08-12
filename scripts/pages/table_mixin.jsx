@@ -61,17 +61,27 @@ let TableMixin = {
         query: JSON.stringify(requestOption)
       });
 
+    function caculAverage(dps) {
+      let sum = 0;
+      let ks = Object.keys(dps);
+      ks.forEach(function (k) {
+        sum += dps[k];
+      });
+      return sum/ks.length;
+    }
+
     $.when(p1, p2)
       .then(function (res1, res2) {
         let result1 = res1[0].result;
         let result2 = res2[0].result;
         let rowData = this.state.rowData;
         let rowItemData = rowData[index];
+
         try {
-          rowData[index].QPS = parseInt(result1[0].dps[Object.keys(result1[0].dps)[0]]/60);
-          rowData[index].RT = parseInt(result1[1].dps[Object.keys(result1[1].dps)[0]]);
-          rowData[index].QPScontrast = parseInt(result2[0].dps[Object.keys(result2[0].dps)[0]]/60);
-          rowData[index].RTcontrast = parseInt(result2[1].dps[Object.keys(result2[1].dps)[0]]);
+          rowData[index].QPS = parseInt(caculAverage(result1[0].dps)/60);
+          rowData[index].RT = parseInt(caculAverage(result1[1].dps));
+          rowData[index].QPScontrast = parseInt(caculAverage(result2[0].dps)/60);
+          rowData[index].RTcontrast = parseInt(caculAverage(result2[1].dps));
           this.setState({
             rowData: rowData
           });
