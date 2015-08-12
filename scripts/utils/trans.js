@@ -1,5 +1,6 @@
 var fs = require('fs');
-var s = fs.readFileSync('./meta').toString();
+var path = require('path');
+var s = fs.readFileSync(path.join(__dirname, './meta')).toString();
 
 s = s.split('\n');
 
@@ -7,11 +8,12 @@ s = s.map(function(line){
   var data = line.split(/\s+/);
   return {
     id: data[0],
-    core: data[1],
+    serviceName: data[1],
     service: data[2],
-    method: data[3],
-    url: data[4],
-    name: data[5]
+    core: data[3],
+    method: data[4],
+    url: data[5],
+    name: data[6]
   }
 })
 
