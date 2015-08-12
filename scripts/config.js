@@ -1,18 +1,5 @@
 module.exports = {
   apiAddress: 'http://api.hawk.qima-inc.com/',
-  dateRage: [
-    {label: '一天'},
-    {label: '一周'},
-    {label: '一月'},
-    {label: '三月'}
-  ],
-  contrast: [
-    {label: '一天前'},
-    {label: '一周前'},
-    {label: '一月前'},
-    {label: '三月前'}
-  ],
-
   pages: [ { id: '1',
     core: '下单',
     service: 'order',
