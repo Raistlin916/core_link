@@ -9,14 +9,14 @@ let ArrowSpan = React.createClass({
               color: '#03b401',
               paddingRight: '12px'
             };
-            arrow = '↓';
+            arrow = '%↓';
             value += arrow;
         }else{
             addClass = {
               color: '#c10000',
               paddingRight: '12px'
             };
-            arrow = '↑';
+            arrow = '%↑';
             value += arrow;
         }
     }
