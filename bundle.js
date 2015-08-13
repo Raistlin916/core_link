@@ -43962,7 +43962,7 @@
 /***/ function(module, exports) {
 
 	module.exports = {
-	  apiAddress: 'http://api.hawk.qima-inc.com/',
+	  apiAddress: 'http://api.hawk.qima-inc.com',
 	  pages: [ { id: '1',
 	    serviceName: '商品',
 	    service: 'goods',
