@@ -44391,6 +44391,7 @@
 	        show: true,
 	        feature: {
 	          dataZoom: { show: true },
+	          dataView: { show: true },
 	          magicType: { show: true, type: ['line', 'bar'] },
 	          restore: { show: true }
 	        }
@@ -91831,6 +91832,7 @@
 	        show: true,
 	        feature: {
 	          dataZoom: { show: true },
+	          dataView: { show: true },
 	          magicType: { show: true, type: ['line', 'bar'] },
 	          restore: { show: true }
 	        }
