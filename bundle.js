@@ -43839,7 +43839,7 @@
 	        };
 	        arrow = '%↓';
 	        value += arrow;
-	      } else {
+	      } else if (value > 0) {
 	        addClass = {
 	          color: '#c10000',
 	          paddingRight: '12px'
@@ -44307,7 +44307,11 @@
 	          null,
 	          '对比数据选择：'
 	        ),
-	        React.createElement(ButtonSelects, { items: contrastItems, onChange: this.handleContrastItemChange })
+	        React.createElement(
+	          'div',
+	          { style: { display: 'inline-block' } },
+	          React.createElement(ButtonSelects, { items: contrastItems, onChange: this.handleContrastItemChange })
+	        )
 	      ),
 	      React.createElement(
 	        'div',
@@ -44445,6 +44449,7 @@
 	      etime: parseInt(new Date() / 1000),
 	      aggregator: 'sum',
 	      metrics: ["qpm"],
+	      ignoreCache: true,
 	      tags: { service: service, method: method }
 	    };
 
@@ -91886,6 +91891,7 @@
 	      etime: parseInt(new Date() / 1000),
 	      aggregator: 'sum',
 	      metrics: ['rt'],
+	      ignoreCache: true,
 	      tags: { service: service, method: method }
 	    };
 
@@ -91910,7 +91916,7 @@
 	      var chartData = [{
 	        name: tName,
 	        keys: kv.keys.map(function (item) {
-	          return moment(item * 1000).format('MM-DD hh');
+	          return moment(item * 1000).format('MM-DD HH:mm');
 	        }),
 	        values: kv.values.map(function (item) {
 	          return item;

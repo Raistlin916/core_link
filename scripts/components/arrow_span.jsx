@@ -11,7 +11,7 @@ let ArrowSpan = React.createClass({
             };
             arrow = '%↓';
             value += arrow;
-        }else{
+        } else if (value > 0){
             addClass = {
               color: '#c10000',
               paddingRight: '12px'

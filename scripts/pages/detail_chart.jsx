@@ -61,7 +61,9 @@ let DetailChart = React.createClass({
         </div>
         <div style={rowStyle}>
           <label>对比数据选择：</label>
-          <ButtonSelects items={contrastItems} onChange={this.handleContrastItemChange}/>
+          <div style={{display: 'inline-block'}}>
+            <ButtonSelects items={contrastItems} onChange={this.handleContrastItemChange}/>
+          </div>
         </div>
         <div style={rowStyle}>
           <label>QPS趋势图：</label>
