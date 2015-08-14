@@ -86,6 +86,7 @@ module.exports = React.createClass({
       etime: parseInt((new Date)/1000),
       aggregator: 'sum',
       metrics: ["qpm"],
+      ignoreCache: true,
       tags:{service: service, method: method}
     };
 

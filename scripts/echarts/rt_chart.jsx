@@ -86,6 +86,7 @@ module.exports = React.createClass({
       etime: parseInt((new Date)/1000),
       aggregator: 'sum',
       metrics: ['rt'],
+      ignoreCache: true,
       tags:{service: service, method: method}
     };
 
@@ -112,7 +113,7 @@ module.exports = React.createClass({
       let chartData = [{
         name: tName,
         keys: kv.keys.map(function (item) {
-          return moment(item*1000).format('MM-DD hh');
+          return moment(item*1000).format('MM-DD HH:mm');
         }),
         values: kv.values.map(function(item){
           return item;
