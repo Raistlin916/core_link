@@ -32,9 +32,15 @@ let headerCols = {
   },
   RTtrend: {
     content: '趋势'
+  },
+  URT: {
+    content: 'URT'
+  },
+  URTtrend: {
+    content: '趋势'
   }
 };
-let colOrder = ['core', 'QPS', 'QPStrend', 'RT', 'RTtrend'];
+let colOrder = ['core', 'RT', 'RTtrend', 'URT', 'URTtrend', 'QPS', 'QPStrend'];
 
 module.exports = React.createClass({
   
@@ -53,26 +59,33 @@ module.exports = React.createClass({
 
     rowData = [rowData1, rowData2].map(function (item) {
       return item.reduce(function (a, b) {
-        return a.QPS == Math.max(a.QPS, b.QPS) ? a : b;
+        a.QPS += b.QPS;
+        a.RT += b.RT;
+        a.URT += b.URT;
+        a.QPScontrast += b.QPScontrast;
+        a.RTcontrast += b.RTcontrast;
+        a.URTcontrast += b.URTcontrast;
+        return a;
       });
     });
 
     rowData.forEach(function (item) {
       item.QPStrend = ((1 - item.QPScontrast/item.QPS) * 100).toFixed(2);
       item.RTtrend = ((1 - item.RTcontrast/item.RT) * 100).toFixed(2);
+      item.URTtrend = ((1 - item.RTcontrast/item.RT) * 100).toFixed(2);
 
       Object.keys(item).forEach(function (k) {
         if (k == 'core') {
           item[k] = {
             content: <Link to="links" params={{name: 'all'}}>{item[k]}</Link>
           };
-        } else if (k == 'QPS' || k == 'RT') {
+        } else if (k == 'QPS' || k == 'RT' || k == 'URT') {
           item[k] = {
             content: item[k] == null ? <span>null</span> : item[k]
           };
-        } else if (k == 'QPStrend' || k == 'RTtrend') {
+        } else if (k == 'QPStrend' || k == 'RTtrend' || k == 'URTtrend') {
           item[k] = {
-            content: <ArrowSpan data={item[k]} />
+            content: <ArrowSpan data={item[k]} reverse={k=='QPStrend'} />
           };
         } else {
           item[k] = {

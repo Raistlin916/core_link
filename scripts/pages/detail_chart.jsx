@@ -3,8 +3,7 @@ let mui = require('material-ui');
 let DropDownMenu = mui.DropDownMenu;
 let TextField = mui.TextField;
 let ButtonSelects = require('../components/button_selects');
-let QPSChart = require('../echarts/qps_chart');
-let RTChart = require('../echarts/rt_chart');
+let Chart = require('../echarts/chart');
 let pagesData = require('../config').pages;
 
 let DetailChart = React.createClass({
@@ -66,12 +65,17 @@ let DetailChart = React.createClass({
           </div>
         </div>
         <div style={rowStyle}>
-          <label>QPS趋势图：</label>
-          <QPSChart {...this.state}/>
+          <label>RT趋势图</label>
+          <Chart {...this.state} metrics="RT"/>
         </div>
         <div style={rowStyle}>
-          <label>RT趋势图</label>
-          <RTChart {...this.state}/>
+          <label>URT趋势图</label>
+          <Chart {...this.state} metrics="URT"/>
+        </div>
+        <div style={rowStyle}>
+          <label>QPS趋势图：</label>
+          <Chart {...this.state} metrics="qpm" metricsName="QPS" 
+            valueMap={function(value){return (value/60).toFixed(2); }}/>
         </div>
       </div>
     )

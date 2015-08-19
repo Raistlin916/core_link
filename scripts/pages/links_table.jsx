@@ -11,19 +11,19 @@ let headerCols = {
   core: {
     content: '核心链路',
     style: {
-      width: '50px'
+      width: '40px'
     }
   },
   feature: {
     content: '功能点',
     style: {
-      width: '150px'
+      width: '100px'
     }
   },
   URL: {
     content: 'URL',
     style: {
-      width: '300px'
+      width: '200px'
     }
   },
   QPS: {
@@ -37,9 +37,15 @@ let headerCols = {
   },
   RTtrend: {
     content: '趋势'
+  },
+  URT: {
+    content: 'URT'
+  },
+  URTtrend: {
+    content: '趋势'
   }
 };
-let colOrder = ['core', 'feature', 'URL', 'QPS', 'QPStrend', 'RT', 'RTtrend'];
+let colOrder = ['core', 'feature', 'URL', 'RT', 'RTtrend', 'URT', 'URTtrend', 'QPS', 'QPStrend'];
 let tableConfig = {
   fixedHeader: true,
   stripedRows: false,
@@ -63,16 +69,17 @@ module.exports = React.createClass({
     rowData.forEach(function (item) {
       item.QPStrend = ((1 - item.QPScontrast/item.QPS) * 100).toFixed(0);
       item.RTtrend = ((1 - item.RTcontrast/item.RT) * 100).toFixed(0);
+      item.URTtrend = ((1 - item.URTcontrast/item.RT) * 100).toFixed(0);
 
       Object.keys(item).forEach(function (k) {
         if (k == 'feature') {
           item[k] = {
             content: <Link to="detail" params={{id: 'chart'}}>{item[k]}</Link>,
             style: {
-              width: '150px'
+              width: '100px'
             }
           };
-        } else if (k == 'QPS' || k == 'RT') {
+        } else if (k == 'QPS' || k == 'RT' || k == 'URT') {
           item[k] = {
             content: item[k] == null ? <span>null</span> : item[k]
           };
@@ -80,18 +87,18 @@ module.exports = React.createClass({
           item[k] = {
             content: item[k],
             style: {
-              width: '300px'
+              width: '200px'
             }
           };
-        } else if (k == 'QPStrend' || k == 'RTtrend') {
+        } else if (k == 'QPStrend' || k == 'RTtrend' || k == 'URTtrend') {
           item[k] = {
-            content: <ArrowSpan data={item[k]} />
+            content: <ArrowSpan data={item[k]} reverse={k=='QPStrend'}/>
           };
         } else if (k == 'core') {
           item[k] = {
             content: item[k],
             style: {
-              width: '50px'
+              width: '40px'
             }
           };
         } else {

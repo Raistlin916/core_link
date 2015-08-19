@@ -46,7 +46,7 @@ module.exports = React.createClass({
       yAxis : [
           {
             position : 'left',
-            name : 'rt'
+            name : this.props.metricsName || this.props.metrics
           }
       ],
       series : chartData.map(function (item) {
@@ -61,9 +61,19 @@ module.exports = React.createClass({
       }
     };
 
+    let seriesData = config.series[0].data.map(function(item){ return +item;});
+    let max = Math.max.apply(Math, seriesData);
+    let min = Math.min.apply(Math, seriesData);
+    let avg = seriesData.length > 0 ? seriesData.reduce(function(a, b){return a+b;})/seriesData.length : 0;
+    avg = parseInt(avg);
+    let spanStyle = {margin: '0 20px'};
+    let pStyle = {textAlign: 'center', width: '800px', fontSize: '12px', marginBottom: '20px'};
+
     return (
       <div>
         <Echarts config={config} />
+        <p style={pStyle}><span style={spanStyle}>max: {max}</span> <span style={spanStyle}>min: {min}</span>
+          <span style={spanStyle}>avg: {avg}</span></p>
       </div>
     );
   },
@@ -72,6 +82,7 @@ module.exports = React.createClass({
     let pageData = pagesData[config.pageIndex];
     let service = pageData.service;
     let method = pageData.method;
+    let valueMap = this.props.valueMap || function(value){return value};
 
     const day = 1000*24*60*60;
     let t = [day, day*7, day*30, day*30*3][config.dateRangeSelectIndex];
@@ -85,7 +96,7 @@ module.exports = React.createClass({
       stime: parseInt((new Date - t)/1000),
       etime: parseInt((new Date)/1000),
       aggregator: 'sum',
-      metrics: ['rt'],
+      metrics: [this.props.metrics],
       ignoreCache: true,
       tags:{service: service, method: method}
     };
@@ -116,7 +127,7 @@ module.exports = React.createClass({
           return moment(item*1000).format('MM-DD HH:mm');
         }),
         values: kv.values.map(function(item){
-          return item;
+          return valueMap(item);
         })
       }];
 
@@ -129,7 +140,7 @@ module.exports = React.createClass({
             return moment(item*1000).format('MM-DD HH:mm');
           }),
           values: kv2.values.map(function(item){
-            return item;
+            return valueMap(item);
           })
         })
       }

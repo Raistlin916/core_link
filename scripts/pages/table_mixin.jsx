@@ -45,7 +45,7 @@ let TableMixin = {
       stime: time - 120,
       etime: time - 60,
       aggregator: 'sum',
-      metrics: ['qpm', 'rt'],
+      metrics: ['qpm', 'rt', 'urt'],
       tags:{service: service, method: method}
     };
 
@@ -80,8 +80,11 @@ let TableMixin = {
         try {
           rowData[index].QPS = parseInt(caculAverage(result1[0].dps)/60);
           rowData[index].RT = parseInt(caculAverage(result1[1].dps));
+          rowData[index].URT = parseInt(caculAverage(result1[2].dps));
           rowData[index].QPScontrast = parseInt(caculAverage(result2[0].dps)/60);
           rowData[index].RTcontrast = parseInt(caculAverage(result2[1].dps));
+          rowData[index].URTcontrast = parseInt(caculAverage(result2[2].dps));
+
           this.setState({
             rowData: rowData
           });
