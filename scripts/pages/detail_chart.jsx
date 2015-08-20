@@ -11,7 +11,7 @@ let DetailChart = React.createClass({
     return {
       dateRangeSelectIndex: 0,
       contrastSelectIndex: null,
-      pageIndex: this.props.params.id
+      pageIndex: this.props.params.id-1
     }
   },
 

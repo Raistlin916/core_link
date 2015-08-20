@@ -41,6 +41,28 @@ let headerCols = {
   }
 };
 let colOrder = ['core', 'RT', 'RTtrend', 'URT', 'URTtrend', 'QPS', 'QPStrend'];
+  
+let groups = [{
+  name: '下单（微信）',
+  group: [1,2,3,6,12,13,14,15]
+},
+{
+  name: '下单（储蓄卡）',
+  group: [1,2,3,6,10,11,12,13,14,15]
+},
+{
+  name: '下单（信用卡）',
+  group: [1,2,3,6,7,8,9,12,13,14,15]
+},
+{ 
+  name: '登录（卖家）',
+  group: [16,17]
+},
+{
+  name: '登录（买家）',
+  group: [18,19] 
+}];
+
 
 module.exports = React.createClass({
   
@@ -57,7 +79,23 @@ module.exports = React.createClass({
       return item.core == '登录';
     });
 
-    rowData = [rowData1, rowData2].map(function (item) {
+    rowData = groups.map(function (item) {
+      return rowData.filter(function (it) {
+        return item.group.some(function (i) {
+          return i == it.id;
+        });
+      });
+    });
+
+    rowData = JSON.parse(JSON.stringify(rowData));
+
+    rowData.forEach(function (item, i) {
+      item.forEach(function (it) {
+        it.core = groups[i].name;
+      });
+    });
+
+    rowData = rowData.map(function (item) {
       return item.reduce(function (a, b) {
         a.QPS += b.QPS;
         a.RT += b.RT;

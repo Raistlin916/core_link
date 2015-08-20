@@ -62,7 +62,7 @@ module.exports = {
     core: '下单',
     method: 'umpay_agreeconfirm',
     url: 'trade.koudaitong.com/pay/umpay/agreeConfirm.json',
-    name: '绑定确认' },
+    name: '信用卡支付确认' },
   { id: '10',
     serviceName: '支付',
     service: 'pay',
