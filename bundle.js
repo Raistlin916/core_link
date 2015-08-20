@@ -44617,7 +44617,7 @@
 	      etime: parseInt(new Date() / 1000),
 	      aggregator: 'sum',
 	      metrics: [this.props.metrics],
-	      ignoreCache: true,
+	      ignoreCache: false,
 	      tags: { service: service, method: method }
 	    };
 
