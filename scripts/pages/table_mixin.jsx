@@ -6,6 +6,7 @@ let TableMixin = {
     return {
       rowData: pagesData.map(function (item) {
         return {
+          id: item.id,
           core: item.core,
           feature: item.name,
           service: item.service,

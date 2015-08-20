@@ -67,14 +67,15 @@ module.exports = React.createClass({
     let rowData = JSON.parse(JSON.stringify(this.state.rowData));
 
     rowData.forEach(function (item) {
-      item.QPStrend = ((1 - item.QPScontrast/item.QPS) * 100).toFixed(0);
-      item.RTtrend = ((1 - item.RTcontrast/item.RT) * 100).toFixed(0);
-      item.URTtrend = ((1 - item.URTcontrast/item.RT) * 100).toFixed(0);
+      let id = item.id;
+      item.QPStrend = ~~((1 - item.QPScontrast/item.QPS) * 100);
+      item.RTtrend = ~~((1 - item.RTcontrast/item.RT) * 100);
+      item.URTtrend = ~~((1 - item.URTcontrast/item.RT) * 100);
 
       Object.keys(item).forEach(function (k) {
         if (k == 'feature') {
           item[k] = {
-            content: <Link to="detail" params={{id: 'chart'}}>{item[k]}</Link>,
+            content: <Link to="detail" params={{id: id}}>{item[k]}</Link>,
             style: {
               width: '100px'
             }

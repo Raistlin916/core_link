@@ -11,7 +11,7 @@ let DetailChart = React.createClass({
     return {
       dateRangeSelectIndex: 0,
       contrastSelectIndex: null,
-      pageIndex: 0
+      pageIndex: this.props.params.id
     }
   },
 
@@ -44,7 +44,6 @@ let DetailChart = React.createClass({
 
     let dateRange = dateRangeItems[this.state.dateRangeSelectIndex];
     let contrastItem = contrastItems[this.state.contrastSelectIndex];
-    let page = pages[this.state.pageIndex];
 
     dateRange && (dateRange.isChecked = true);
     contrastItem && (contrastItem.isChecked = true);
@@ -53,7 +52,7 @@ let DetailChart = React.createClass({
       <div>
         <div style={rowStyle}>
           <label>监控页面选择：</label>
-          <DropDownMenu menuItems={pages} onChange={this.handlePageChange} />
+          <DropDownMenu menuItems={pages} onChange={this.handlePageChange} selectedIndex={this.state.pageIndex} />
           <div style={{display: 'inline-block'}}>
             <ButtonSelects items={dateRangeItems} onChange={this.handleDateRangeChange}/>
           </div>

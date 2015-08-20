@@ -66,6 +66,8 @@ module.exports = React.createClass({
     let min = Math.min.apply(Math, seriesData);
     let avg = seriesData.length > 0 ? seriesData.reduce(function(a, b){return a+b;})/seriesData.length : 0;
     avg = parseInt(avg);
+    max = parseInt(max);
+    min = parseInt(min);
     let spanStyle = {margin: '0 20px'};
     let pStyle = {textAlign: 'center', width: '800px', fontSize: '12px', marginBottom: '20px'};
 
