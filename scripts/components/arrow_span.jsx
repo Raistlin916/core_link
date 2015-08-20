@@ -7,20 +7,19 @@ let ArrowSpan = React.createClass({
 
     if(!isNaN(value)){
 
-        if(value * (reverse?-1:1) < 0){
-            // addClass = {
-            //   color: '#03b401',
-            //   paddingRight: '12px'
-            // };
-            arrow = '%';
-            value += arrow;
-        } else if (value * (reverse?-1:1) > 0){
-            // 红色
+        if(value < 0){
             addClass = {
-              color: '#c10000',
+              color: reverse ? '#c10000' : null,
               paddingRight: '12px'
             };
-            arrow = '%';
+            arrow = '% ↓';
+            value += arrow;
+        } else if (value > 0){
+            addClass = {
+              color: reverse ? null : '#c10000',
+              paddingRight: '12px'
+            };
+            arrow = '% ↑';
             value += arrow;
         }
     }
