@@ -43726,6 +43726,23 @@
 	};
 	var colOrder = ['core', 'RT', 'RTtrend', 'URT', 'URTtrend', 'QPS', 'QPStrend'];
 
+	var groups = [{
+	  name: '下单（微信）',
+	  group: [1, 2, 3, 6, 12, 13, 14, 15]
+	}, {
+	  name: '下单（储蓄卡）',
+	  group: [1, 2, 3, 6, 10, 11, 12, 13, 14, 15]
+	}, {
+	  name: '下单（信用卡）',
+	  group: [1, 2, 3, 6, 7, 8, 9, 12, 13, 14, 15]
+	}, {
+	  name: '登录（卖家）',
+	  group: [16, 17]
+	}, {
+	  name: '登录（买家）',
+	  group: [18, 19]
+	}];
+
 	module.exports = React.createClass({
 	  displayName: 'exports',
 
@@ -43742,7 +43759,23 @@
 	      return item.core == '登录';
 	    });
 
-	    rowData = [rowData1, rowData2].map(function (item) {
+	    rowData = groups.map(function (item) {
+	      return rowData.filter(function (it) {
+	        return item.group.some(function (i) {
+	          return i == it.id;
+	        });
+	      });
+	    });
+
+	    rowData = JSON.parse(JSON.stringify(rowData));
+
+	    rowData.forEach(function (item, i) {
+	      item.forEach(function (it) {
+	        it.core = groups[i].name;
+	      });
+	    });
+
+	    rowData = rowData.map(function (item) {
 	      return item.reduce(function (a, b) {
 	        a.QPS += b.QPS;
 	        a.RT += b.RT;
@@ -44046,7 +44079,7 @@
 	    core: '下单',
 	    method: 'umpay_agreeconfirm',
 	    url: 'trade.koudaitong.com/pay/umpay/agreeConfirm.json',
-	    name: '绑定确认' },
+	    name: '信用卡支付确认' },
 	  { id: '10',
 	    serviceName: '支付',
 	    service: 'pay',
@@ -44284,7 +44317,7 @@
 	    return {
 	      dateRangeSelectIndex: 0,
 	      contrastSelectIndex: null,
-	      pageIndex: this.props.params.id
+	      pageIndex: this.props.params.id - 1
 	    };
 	  },
 
