@@ -43871,38 +43871,36 @@
 	'use strict';
 
 	var ArrowSpan = React.createClass({
-	  displayName: 'ArrowSpan',
+	    displayName: 'ArrowSpan',
 
-	  render: function render() {
-	    var value = this.props.data,
-	        addClass = null,
-	        arrow = null,
-	        reverse = this.props.reverse;
+	    render: function render() {
+	        var value = this.props.data,
+	            addClass = null,
+	            arrow = null,
+	            reverse = this.props.reverse;
 
-	    if (!isNaN(value)) {
+	        if (!isNaN(value)) {
 
-	      if (value < 0) {
-	        addClass = {
-	          color: reverse ? '#c10000' : null,
-	          paddingRight: '12px'
-	        };
-	        arrow = '% ↓';
-	        value += arrow;
-	      } else if (value > 0) {
-	        addClass = {
-	          color: reverse ? null : '#c10000',
-	          paddingRight: '12px'
-	        };
-	        arrow = '% ↑';
-	        value += arrow;
-	      }
+	            if (value < 0) {
+	                addClass = {
+	                    color: reverse ? '#c10000' : null
+	                };
+	                arrow = '% ↓';
+	                value += arrow;
+	            } else if (value > 0) {
+	                addClass = {
+	                    color: reverse ? null : '#c10000'
+	                };
+	                arrow = '% ↑';
+	                value += arrow;
+	            }
+	        }
+	        return React.createElement(
+	            'span',
+	            { style: addClass },
+	            value
+	        );
 	    }
-	    return React.createElement(
-	      'span',
-	      { style: addClass },
-	      value
-	    );
-	  }
 	});
 
 	module.exports = ArrowSpan;
