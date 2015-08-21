@@ -44380,7 +44380,7 @@
 	          null,
 	          'RT趋势图'
 	        ),
-	        React.createElement(Chart, _extends({}, this.state, { metrics: 'RT' }))
+	        React.createElement(Chart, _extends({}, this.state, { metrics: 'RT', YUnit: 'ms' }))
 	      ),
 	      React.createElement(
 	        'div',
@@ -44390,7 +44390,7 @@
 	          null,
 	          'URT趋势图'
 	        ),
-	        React.createElement(Chart, _extends({}, this.state, { metrics: 'URT' }))
+	        React.createElement(Chart, _extends({}, this.state, { metrics: 'URT', YUnit: 'ms' }))
 	      ),
 	      React.createElement(
 	        'div',
@@ -44513,6 +44513,7 @@
 	  },
 	  render: function render() {
 	    var chartData = this.state.chartData;
+	    var YUnit = this.props.YUnit ? ' ' + this.props.YUnit : '';
 
 	    var config = {
 	      showLoading: false,
@@ -44538,7 +44539,12 @@
 	      }],
 	      yAxis: [{
 	        position: 'left',
-	        name: this.props.metricsName || this.props.metrics
+	        name: this.props.metricsName || this.props.metrics,
+	        axisLabel: {
+	          formatter: function formatter(value) {
+	            return value + YUnit;
+	          }
+	        }
 	      }],
 	      series: chartData.map(function (item) {
 	        return {
@@ -44577,20 +44583,23 @@
 	          'span',
 	          { style: spanStyle },
 	          'max: ',
-	          max
+	          max,
+	          YUnit
 	        ),
 	        ' ',
 	        React.createElement(
 	          'span',
 	          { style: spanStyle },
 	          'min: ',
-	          min
+	          min,
+	          YUnit
 	        ),
 	        React.createElement(
 	          'span',
 	          { style: spanStyle },
 	          'avg: ',
-	          avg
+	          avg,
+	          YUnit
 	        )
 	      )
 	    );

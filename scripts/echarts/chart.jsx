@@ -18,6 +18,7 @@ module.exports = React.createClass({
   },
   render: function(){
     let chartData = this.state.chartData;
+    let YUnit = this.props.YUnit ? (' '+ this.props.YUnit) : '';
 
     let config = {
       showLoading: false,
@@ -46,7 +47,13 @@ module.exports = React.createClass({
       yAxis : [
           {
             position : 'left',
-            name : this.props.metricsName || this.props.metrics
+            name : this.props.metricsName || this.props.metrics,
+            axisLabel : {
+                formatter: function(value)
+                {
+                   return value + YUnit;
+                }
+            }
           }
       ],
       series : chartData.map(function (item) {
@@ -74,8 +81,8 @@ module.exports = React.createClass({
     return (
       <div>
         <Echarts config={config} />
-        <p style={pStyle}><span style={spanStyle}>max: {max}</span> <span style={spanStyle}>min: {min}</span>
-          <span style={spanStyle}>avg: {avg}</span></p>
+        <p style={pStyle}><span style={spanStyle}>max: {max}{YUnit}</span> <span style={spanStyle}>min: {min}{YUnit}</span>
+          <span style={spanStyle}>avg: {avg}{YUnit}</span></p>
       </div>
     );
   },

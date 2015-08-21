@@ -65,11 +65,11 @@ let DetailChart = React.createClass({
         </div>
         <div style={rowStyle}>
           <label>RT趋势图</label>
-          <Chart {...this.state} metrics="RT"/>
+          <Chart {...this.state} metrics="RT" YUnit="ms"/>
         </div>
         <div style={rowStyle}>
           <label>URT趋势图</label>
-          <Chart {...this.state} metrics="URT"/>
+          <Chart {...this.state} metrics="URT" YUnit="ms"/>
         </div>
         <div style={rowStyle}>
           <label>QPS趋势图：</label>
