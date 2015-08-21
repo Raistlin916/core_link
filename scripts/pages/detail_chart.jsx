@@ -74,7 +74,7 @@ let DetailChart = React.createClass({
         <div style={rowStyle}>
           <label>QPS趋势图：</label>
           <Chart {...this.state} metrics="qpm" metricsName="QPS" 
-            valueMap={function(value){return (value/60).toFixed(2); }}/>
+            valueMap={function(value){return (value/60).toFixed(2); }} aggregator="sum" />
         </div>
       </div>
     )

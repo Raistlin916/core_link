@@ -44403,7 +44403,7 @@
 	        React.createElement(Chart, _extends({}, this.state, { metrics: 'qpm', metricsName: 'QPS',
 	          valueMap: function (value) {
 	            return (value / 60).toFixed(2);
-	          } }))
+	          }, aggregator: 'sum' }))
 	      )
 	    );
 	  },
@@ -44624,7 +44624,7 @@
 	      business: 'youzan_core_service',
 	      stime: parseInt((new Date() - t) / 1000),
 	      etime: parseInt(new Date() / 1000),
-	      aggregator: 'sum',
+	      aggregator: this.props.aggregator || 'avg',
 	      metrics: [this.props.metrics],
 	      ignoreCache: false,
 	      tags: { service: service, method: method }

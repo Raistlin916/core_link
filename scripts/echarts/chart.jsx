@@ -104,7 +104,7 @@ module.exports = React.createClass({
       business: 'youzan_core_service',
       stime: parseInt((new Date - t)/1000),
       etime: parseInt((new Date)/1000),
-      aggregator: 'sum',
+      aggregator: this.props.aggregator || 'avg',
       metrics: [this.props.metrics],
       ignoreCache: false,
       tags:{service: service, method: method}
