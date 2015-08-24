@@ -3,10 +3,7 @@ var path = require('path');
 
 module.exports = {
   entry: {
-    app: './scripts/main.jsx',
-    vendor: ['react', 'material-ui', 
-    , 'react-router', 'react-tap-event-plugin', 'moment'
-    , 'echarts', 'zrender'],
+    app: './scripts/main.jsx'
   },
   output: {
     filename: 'bundle.js',
@@ -20,7 +17,15 @@ module.exports = {
     ]
   },
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin('vendor', 'vendors.js')
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      filename: 'vendors.js',
+      minChunks: function (module, count) {
+        return module.resource 
+          && (module.resource.indexOf('vendor') !== -1
+          || module.resource.indexOf('node_modules') !== -1);
+      }
+    })
   ],
 
   // externals: {
