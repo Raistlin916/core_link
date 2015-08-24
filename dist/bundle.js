@@ -5,10 +5,11 @@ webpackJsonp([0],{
 
 	'use strict';
 
-	var Router = __webpack_require__(1);
+	var React = __webpack_require__(1);
+	window.React = React;
+	var Router = __webpack_require__(157);
 	var Route = Router.Route;
 	var App = __webpack_require__(196);
-	var React = __webpack_require__(5);
 
 	var MainTable = __webpack_require__(354);
 	var LinksTable = __webpack_require__(359);
@@ -37,14 +38,14 @@ webpackJsonp([0],{
 	'use strict';
 
 	__webpack_require__(350);
-	var React = __webpack_require__(5);
-	var Router = __webpack_require__(1);
+	var React = __webpack_require__(1);
+	var Router = __webpack_require__(157);
 	var mui = __webpack_require__(197);
 	var ThemeManager = new mui.Styles.ThemeManager();
 	var AppBar = mui.AppBar;
 	var IconButton = mui.IconButton;
 	var RouteHandler = Router.RouteHandler;
-	var Link = __webpack_require__(1).Link;
+	var Link = __webpack_require__(157).Link;
 
 	var ReactAdd = __webpack_require__(203);
 	var PureRenderMixin = ReactAdd.addons.PureRenderMixin;
@@ -129,11 +130,11 @@ webpackJsonp([0],{
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var React = __webpack_require__(5);
+	var React = __webpack_require__(1);
 	var mui = __webpack_require__(197);
 	var Table = mui.Table;
 	var hack = __webpack_require__(355);
-	var Link = __webpack_require__(1).Link;
+	var Link = __webpack_require__(157).Link;
 	var ArrowSpan = __webpack_require__(356);
 	var TableMixin = __webpack_require__(357);
 
@@ -286,7 +287,7 @@ webpackJsonp([0],{
 
 	'use strict';
 
-	var React = __webpack_require__(5);
+	var React = __webpack_require__(1);
 
 	function wrapNum(data) {
 	  data.forEach(function (item) {
@@ -609,11 +610,11 @@ webpackJsonp([0],{
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var React = __webpack_require__(5);
+	var React = __webpack_require__(1);
 	var mui = __webpack_require__(197);
 	var Table = mui.Table;
 	var hack = __webpack_require__(355);
-	var Link = __webpack_require__(1).Link;
+	var Link = __webpack_require__(157).Link;
 	var ArrowSpan = __webpack_require__(356);
 	var TableMixin = __webpack_require__(357);
 
@@ -752,7 +753,7 @@ webpackJsonp([0],{
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var React = __webpack_require__(5);
+	var React = __webpack_require__(1);
 	var mui = __webpack_require__(197);
 	var DropDownMenu = mui.DropDownMenu;
 	var TextField = mui.TextField;
@@ -892,7 +893,7 @@ webpackJsonp([0],{
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var React = __webpack_require__(5);
+	var React = __webpack_require__(1);
 	var mui = __webpack_require__(197);
 	var RaisedButton = mui.RaisedButton;
 	var FlatButton = mui.FlatButton;
@@ -947,7 +948,7 @@ webpackJsonp([0],{
 
 	'use strict';
 
-	var React = __webpack_require__(5);
+	var React = __webpack_require__(1);
 	var Echarts = __webpack_require__(363);
 	var apiAddress = __webpack_require__(358).apiAddress;
 	var pagesData = __webpack_require__(358).pages;
@@ -1168,7 +1169,7 @@ webpackJsonp([0],{
 
 	'use strict';
 
-	var React = __webpack_require__(5);
+	var React = __webpack_require__(1);
 	var echarts = __webpack_require__(364);
 
 	var Echarts = React.createClass({

@@ -1,7 +1,8 @@
+let React = require('react');
+window.React = React;
 let Router = require('react-router');
 let Route = Router.Route;
 let App = require('./app');
-let React = require('react');
 
 let MainTable = require('./pages/main_table');
 let LinksTable = require('./pages/links_table');
