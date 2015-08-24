@@ -3,6 +3,7 @@ let Echarts = require('./echarts');
 let apiAddress = require('../config').apiAddress;
 let pagesData = require('../config').pages;
 let moment = require('moment');
+let $ = require('jquery');
 require('echarts/chart/line');
 require('echarts/chart/bar');
 

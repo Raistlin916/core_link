@@ -1,5 +1,6 @@
 let pagesData = require('../config').pages;
 let apiAddress = require('../config').apiAddress;
+let $ = require('jquery');
 
 let TableMixin = {
    getInitialState: function () {

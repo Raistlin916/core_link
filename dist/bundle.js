@@ -12,9 +12,9 @@ webpackJsonp([0],{
 	var App = __webpack_require__(196);
 
 	var MainTable = __webpack_require__(354);
-	var LinksTable = __webpack_require__(359);
-	var DetailChart = __webpack_require__(360);
-	var injectTapEventPlugin = __webpack_require__(545);
+	var LinksTable = __webpack_require__(360);
+	var DetailChart = __webpack_require__(361);
+	var injectTapEventPlugin = __webpack_require__(546);
 	injectTapEventPlugin();
 
 	// declare our routes and their hierarchy
@@ -364,6 +364,7 @@ webpackJsonp([0],{
 
 	var pagesData = __webpack_require__(358).pages;
 	var apiAddress = __webpack_require__(358).apiAddress;
+	var $ = __webpack_require__(359);
 
 	var TableMixin = {
 	  getInitialState: function getInitialState() {
@@ -603,7 +604,7 @@ webpackJsonp([0],{
 
 /***/ },
 
-/***/ 359:
+/***/ 360:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -746,7 +747,7 @@ webpackJsonp([0],{
 
 /***/ },
 
-/***/ 360:
+/***/ 361:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -757,8 +758,8 @@ webpackJsonp([0],{
 	var mui = __webpack_require__(197);
 	var DropDownMenu = mui.DropDownMenu;
 	var TextField = mui.TextField;
-	var ButtonSelects = __webpack_require__(361);
-	var Chart = __webpack_require__(362);
+	var ButtonSelects = __webpack_require__(362);
+	var Chart = __webpack_require__(363);
 	var pagesData = __webpack_require__(358).pages;
 
 	var DetailChart = React.createClass({
@@ -886,7 +887,7 @@ webpackJsonp([0],{
 
 /***/ },
 
-/***/ 361:
+/***/ 362:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -943,18 +944,19 @@ webpackJsonp([0],{
 
 /***/ },
 
-/***/ 362:
+/***/ 363:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(1);
-	var Echarts = __webpack_require__(363);
+	var Echarts = __webpack_require__(452);
 	var apiAddress = __webpack_require__(358).apiAddress;
 	var pagesData = __webpack_require__(358).pages;
-	var moment = __webpack_require__(446);
-	__webpack_require__(534);
-	__webpack_require__(544);
+	var moment = __webpack_require__(364);
+	var $ = __webpack_require__(359);
+	__webpack_require__(535);
+	__webpack_require__(545);
 
 	module.exports = React.createClass({
 	  displayName: 'exports',
@@ -1164,13 +1166,204 @@ webpackJsonp([0],{
 
 /***/ },
 
-/***/ 363:
+/***/ 366:
+/***/ function(module, exports, __webpack_require__) {
+
+	var map = {
+		"./af": 367,
+		"./af.js": 367,
+		"./ar": 368,
+		"./ar-ma": 369,
+		"./ar-ma.js": 369,
+		"./ar-sa": 370,
+		"./ar-sa.js": 370,
+		"./ar-tn": 371,
+		"./ar-tn.js": 371,
+		"./ar.js": 368,
+		"./az": 372,
+		"./az.js": 372,
+		"./be": 373,
+		"./be.js": 373,
+		"./bg": 374,
+		"./bg.js": 374,
+		"./bn": 375,
+		"./bn.js": 375,
+		"./bo": 376,
+		"./bo.js": 376,
+		"./br": 377,
+		"./br.js": 377,
+		"./bs": 378,
+		"./bs.js": 378,
+		"./ca": 379,
+		"./ca.js": 379,
+		"./cs": 380,
+		"./cs.js": 380,
+		"./cv": 381,
+		"./cv.js": 381,
+		"./cy": 382,
+		"./cy.js": 382,
+		"./da": 383,
+		"./da.js": 383,
+		"./de": 384,
+		"./de-at": 385,
+		"./de-at.js": 385,
+		"./de.js": 384,
+		"./el": 386,
+		"./el.js": 386,
+		"./en-au": 387,
+		"./en-au.js": 387,
+		"./en-ca": 388,
+		"./en-ca.js": 388,
+		"./en-gb": 389,
+		"./en-gb.js": 389,
+		"./eo": 390,
+		"./eo.js": 390,
+		"./es": 391,
+		"./es.js": 391,
+		"./et": 392,
+		"./et.js": 392,
+		"./eu": 393,
+		"./eu.js": 393,
+		"./fa": 394,
+		"./fa.js": 394,
+		"./fi": 395,
+		"./fi.js": 395,
+		"./fo": 396,
+		"./fo.js": 396,
+		"./fr": 397,
+		"./fr-ca": 398,
+		"./fr-ca.js": 398,
+		"./fr.js": 397,
+		"./fy": 399,
+		"./fy.js": 399,
+		"./gl": 400,
+		"./gl.js": 400,
+		"./he": 401,
+		"./he.js": 401,
+		"./hi": 402,
+		"./hi.js": 402,
+		"./hr": 403,
+		"./hr.js": 403,
+		"./hu": 404,
+		"./hu.js": 404,
+		"./hy-am": 405,
+		"./hy-am.js": 405,
+		"./id": 406,
+		"./id.js": 406,
+		"./is": 407,
+		"./is.js": 407,
+		"./it": 408,
+		"./it.js": 408,
+		"./ja": 409,
+		"./ja.js": 409,
+		"./jv": 410,
+		"./jv.js": 410,
+		"./ka": 411,
+		"./ka.js": 411,
+		"./km": 412,
+		"./km.js": 412,
+		"./ko": 413,
+		"./ko.js": 413,
+		"./lb": 414,
+		"./lb.js": 414,
+		"./lt": 415,
+		"./lt.js": 415,
+		"./lv": 416,
+		"./lv.js": 416,
+		"./me": 417,
+		"./me.js": 417,
+		"./mk": 418,
+		"./mk.js": 418,
+		"./ml": 419,
+		"./ml.js": 419,
+		"./mr": 420,
+		"./mr.js": 420,
+		"./ms": 421,
+		"./ms-my": 422,
+		"./ms-my.js": 422,
+		"./ms.js": 421,
+		"./my": 423,
+		"./my.js": 423,
+		"./nb": 424,
+		"./nb.js": 424,
+		"./ne": 425,
+		"./ne.js": 425,
+		"./nl": 426,
+		"./nl.js": 426,
+		"./nn": 427,
+		"./nn.js": 427,
+		"./pl": 428,
+		"./pl.js": 428,
+		"./pt": 429,
+		"./pt-br": 430,
+		"./pt-br.js": 430,
+		"./pt.js": 429,
+		"./ro": 431,
+		"./ro.js": 431,
+		"./ru": 432,
+		"./ru.js": 432,
+		"./si": 433,
+		"./si.js": 433,
+		"./sk": 434,
+		"./sk.js": 434,
+		"./sl": 435,
+		"./sl.js": 435,
+		"./sq": 436,
+		"./sq.js": 436,
+		"./sr": 437,
+		"./sr-cyrl": 438,
+		"./sr-cyrl.js": 438,
+		"./sr.js": 437,
+		"./sv": 439,
+		"./sv.js": 439,
+		"./ta": 440,
+		"./ta.js": 440,
+		"./th": 441,
+		"./th.js": 441,
+		"./tl-ph": 442,
+		"./tl-ph.js": 442,
+		"./tr": 443,
+		"./tr.js": 443,
+		"./tzl": 444,
+		"./tzl.js": 444,
+		"./tzm": 445,
+		"./tzm-latn": 446,
+		"./tzm-latn.js": 446,
+		"./tzm.js": 445,
+		"./uk": 447,
+		"./uk.js": 447,
+		"./uz": 448,
+		"./uz.js": 448,
+		"./vi": 449,
+		"./vi.js": 449,
+		"./zh-cn": 450,
+		"./zh-cn.js": 450,
+		"./zh-tw": 451,
+		"./zh-tw.js": 451
+	};
+	function webpackContext(req) {
+		return __webpack_require__(webpackContextResolve(req));
+	};
+	function webpackContextResolve(req) {
+		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
+	};
+	webpackContext.keys = function webpackContextKeys() {
+		return Object.keys(map);
+	};
+	webpackContext.resolve = webpackContextResolve;
+	module.exports = webpackContext;
+	webpackContext.id = 366;
+
+
+/***/ },
+
+/***/ 452:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(1);
-	var echarts = __webpack_require__(364);
+	var echarts = __webpack_require__(453);
 
 	var Echarts = React.createClass({
 	    displayName: 'Echarts',
@@ -1211,197 +1404,6 @@ webpackJsonp([0],{
 	    }
 	});
 	module.exports = Echarts;
-
-/***/ },
-
-/***/ 448:
-/***/ function(module, exports, __webpack_require__) {
-
-	var map = {
-		"./af": 449,
-		"./af.js": 449,
-		"./ar": 450,
-		"./ar-ma": 451,
-		"./ar-ma.js": 451,
-		"./ar-sa": 452,
-		"./ar-sa.js": 452,
-		"./ar-tn": 453,
-		"./ar-tn.js": 453,
-		"./ar.js": 450,
-		"./az": 454,
-		"./az.js": 454,
-		"./be": 455,
-		"./be.js": 455,
-		"./bg": 456,
-		"./bg.js": 456,
-		"./bn": 457,
-		"./bn.js": 457,
-		"./bo": 458,
-		"./bo.js": 458,
-		"./br": 459,
-		"./br.js": 459,
-		"./bs": 460,
-		"./bs.js": 460,
-		"./ca": 461,
-		"./ca.js": 461,
-		"./cs": 462,
-		"./cs.js": 462,
-		"./cv": 463,
-		"./cv.js": 463,
-		"./cy": 464,
-		"./cy.js": 464,
-		"./da": 465,
-		"./da.js": 465,
-		"./de": 466,
-		"./de-at": 467,
-		"./de-at.js": 467,
-		"./de.js": 466,
-		"./el": 468,
-		"./el.js": 468,
-		"./en-au": 469,
-		"./en-au.js": 469,
-		"./en-ca": 470,
-		"./en-ca.js": 470,
-		"./en-gb": 471,
-		"./en-gb.js": 471,
-		"./eo": 472,
-		"./eo.js": 472,
-		"./es": 473,
-		"./es.js": 473,
-		"./et": 474,
-		"./et.js": 474,
-		"./eu": 475,
-		"./eu.js": 475,
-		"./fa": 476,
-		"./fa.js": 476,
-		"./fi": 477,
-		"./fi.js": 477,
-		"./fo": 478,
-		"./fo.js": 478,
-		"./fr": 479,
-		"./fr-ca": 480,
-		"./fr-ca.js": 480,
-		"./fr.js": 479,
-		"./fy": 481,
-		"./fy.js": 481,
-		"./gl": 482,
-		"./gl.js": 482,
-		"./he": 483,
-		"./he.js": 483,
-		"./hi": 484,
-		"./hi.js": 484,
-		"./hr": 485,
-		"./hr.js": 485,
-		"./hu": 486,
-		"./hu.js": 486,
-		"./hy-am": 487,
-		"./hy-am.js": 487,
-		"./id": 488,
-		"./id.js": 488,
-		"./is": 489,
-		"./is.js": 489,
-		"./it": 490,
-		"./it.js": 490,
-		"./ja": 491,
-		"./ja.js": 491,
-		"./jv": 492,
-		"./jv.js": 492,
-		"./ka": 493,
-		"./ka.js": 493,
-		"./km": 494,
-		"./km.js": 494,
-		"./ko": 495,
-		"./ko.js": 495,
-		"./lb": 496,
-		"./lb.js": 496,
-		"./lt": 497,
-		"./lt.js": 497,
-		"./lv": 498,
-		"./lv.js": 498,
-		"./me": 499,
-		"./me.js": 499,
-		"./mk": 500,
-		"./mk.js": 500,
-		"./ml": 501,
-		"./ml.js": 501,
-		"./mr": 502,
-		"./mr.js": 502,
-		"./ms": 503,
-		"./ms-my": 504,
-		"./ms-my.js": 504,
-		"./ms.js": 503,
-		"./my": 505,
-		"./my.js": 505,
-		"./nb": 506,
-		"./nb.js": 506,
-		"./ne": 507,
-		"./ne.js": 507,
-		"./nl": 508,
-		"./nl.js": 508,
-		"./nn": 509,
-		"./nn.js": 509,
-		"./pl": 510,
-		"./pl.js": 510,
-		"./pt": 511,
-		"./pt-br": 512,
-		"./pt-br.js": 512,
-		"./pt.js": 511,
-		"./ro": 513,
-		"./ro.js": 513,
-		"./ru": 514,
-		"./ru.js": 514,
-		"./si": 515,
-		"./si.js": 515,
-		"./sk": 516,
-		"./sk.js": 516,
-		"./sl": 517,
-		"./sl.js": 517,
-		"./sq": 518,
-		"./sq.js": 518,
-		"./sr": 519,
-		"./sr-cyrl": 520,
-		"./sr-cyrl.js": 520,
-		"./sr.js": 519,
-		"./sv": 521,
-		"./sv.js": 521,
-		"./ta": 522,
-		"./ta.js": 522,
-		"./th": 523,
-		"./th.js": 523,
-		"./tl-ph": 524,
-		"./tl-ph.js": 524,
-		"./tr": 525,
-		"./tr.js": 525,
-		"./tzl": 526,
-		"./tzl.js": 526,
-		"./tzm": 527,
-		"./tzm-latn": 528,
-		"./tzm-latn.js": 528,
-		"./tzm.js": 527,
-		"./uk": 529,
-		"./uk.js": 529,
-		"./uz": 530,
-		"./uz.js": 530,
-		"./vi": 531,
-		"./vi.js": 531,
-		"./zh-cn": 532,
-		"./zh-cn.js": 532,
-		"./zh-tw": 533,
-		"./zh-tw.js": 533
-	};
-	function webpackContext(req) {
-		return __webpack_require__(webpackContextResolve(req));
-	};
-	function webpackContextResolve(req) {
-		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
-	};
-	webpackContext.keys = function webpackContextKeys() {
-		return Object.keys(map);
-	};
-	webpackContext.resolve = webpackContextResolve;
-	module.exports = webpackContext;
-	webpackContext.id = 448;
-
 
 /***/ }
 
