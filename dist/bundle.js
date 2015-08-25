@@ -37,22 +37,18 @@ webpackJsonp([0],{
 
 	'use strict';
 
-	__webpack_require__(350);
+	__webpack_require__(197);
 	var React = __webpack_require__(1);
 	var Router = __webpack_require__(157);
-	var mui = __webpack_require__(197);
+	var mui = __webpack_require__(201);
 	var ThemeManager = new mui.Styles.ThemeManager();
 	var AppBar = mui.AppBar;
 	var IconButton = mui.IconButton;
 	var RouteHandler = Router.RouteHandler;
 	var Link = __webpack_require__(157).Link;
 
-	var ReactAdd = __webpack_require__(203);
-	var PureRenderMixin = ReactAdd.addons.PureRenderMixin;
 	var NavigationClose = React.createClass({
 	  displayName: 'NavigationClose',
-
-	  mixins: [PureRenderMixin],
 
 	  goIndex: function goIndex() {
 	    window.location.hash = '';
@@ -131,24 +127,13 @@ webpackJsonp([0],{
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	var React = __webpack_require__(1);
-	var mui = __webpack_require__(197);
+	var mui = __webpack_require__(201);
 	var Table = mui.Table;
 	var hack = __webpack_require__(355);
 	var Link = __webpack_require__(157).Link;
 	var ArrowSpan = __webpack_require__(356);
 	var TableMixin = __webpack_require__(357);
 
-	var tableConfig = {
-	  fixedHeader: true,
-	  stripedRows: false,
-	  showRowHover: true,
-	  selectable: true,
-	  multiSelectable: false,
-	  deselectOnClickaway: true,
-	  displayRowCheckbox: false,
-	  displaySelectAll: false,
-	  height: '600px'
-	};
 	var headerCols = {
 	  core: {
 	    content: '核心链路'
@@ -276,7 +261,7 @@ webpackJsonp([0],{
 	      headerColumns: headerCols,
 	      columnOrder: colOrder,
 	      rowData: rowData
-	    }, tableConfig));
+	    }, this.tableConfig));
 	  }
 	});
 
@@ -385,6 +370,19 @@ webpackJsonp([0],{
 	      })
 	    };
 	  },
+
+	  tableConfig: {
+	    fixedHeader: true,
+	    stripedRows: false,
+	    showRowHover: true,
+	    selectable: true,
+	    multiSelectable: false,
+	    deselectOnClickaway: true,
+	    displayRowCheckbox: false,
+	    displaySelectAll: false,
+	    height: '600px'
+	  },
+
 	  componentDidMount: function componentDidMount() {
 	    this.interval = setInterval((function () {
 	      this.updateAllRow();
@@ -403,15 +401,54 @@ webpackJsonp([0],{
 	    }).bind(this));
 	  },
 
-	  fetchItemData: function fetchItemData(service, method, index) {
-	    var time = parseInt(new Date() / 1000);
+	  caculAverage: function caculAverage(dps) {
+	    var sum = 0;
+	    var ks = Object.keys(dps);
+	    ks.forEach(function (k) {
+	      sum += dps[k];
+	    });
+	    return sum / ks.length;
+	  },
 
+	  fetchItemData: function fetchItemData(service, method, index) {
+	    var caculAverage = this.caculAverage;
+	    this.fetchMetaData(service, method, 'avg', ['rt', 'urt']).then((function (res1, res2) {
+	      var result1 = res1[0].result;
+	      var result2 = res2[0].result;
+	      var rowData = this.state.rowData;
+
+	      rowData[index].RT = parseInt(caculAverage(result1[0].dps));
+	      rowData[index].URT = parseInt(caculAverage(result1[1].dps));
+	      rowData[index].RTcontrast = parseInt(caculAverage(result2[0].dps));
+	      rowData[index].URTcontrast = parseInt(caculAverage(result2[1].dps));
+
+	      this.setState({
+	        rowData: rowData
+	      });
+	    }).bind(this));
+
+	    this.fetchMetaData(service, method, 'sum', ['qpm']).then((function (res1, res2) {
+	      var result1 = res1[0].result;
+	      var result2 = res2[0].result;
+	      var rowData = this.state.rowData;
+
+	      rowData[index].QPS = parseInt(caculAverage(result1[0].dps) / 60);
+	      rowData[index].QPScontrast = parseInt(caculAverage(result2[0].dps) / 60);
+
+	      this.setState({
+	        rowData: rowData
+	      });
+	    }).bind(this));
+	  },
+
+	  fetchMetaData: function fetchMetaData(service, method, aggregator, metrics) {
+	    var time = parseInt(new Date() / 1000);
 	    var requestOption = {
 	      business: 'youzan_core_service',
 	      stime: time - 120,
 	      etime: time - 60,
-	      aggregator: 'sum',
-	      metrics: ['qpm', 'rt', 'urt'],
+	      aggregator: aggregator,
+	      metrics: metrics,
 	      tags: { service: service, method: method }
 	    };
 
@@ -425,36 +462,7 @@ webpackJsonp([0],{
 	      query: JSON.stringify(requestOption)
 	    });
 
-	    function caculAverage(dps) {
-	      var sum = 0;
-	      var ks = Object.keys(dps);
-	      ks.forEach(function (k) {
-	        sum += dps[k];
-	      });
-	      return sum / ks.length;
-	    }
-
-	    $.when(p1, p2).then((function (res1, res2) {
-	      var result1 = res1[0].result;
-	      var result2 = res2[0].result;
-	      var rowData = this.state.rowData;
-	      var rowItemData = rowData[index];
-
-	      try {
-	        rowData[index].QPS = parseInt(caculAverage(result1[0].dps) / 60);
-	        rowData[index].RT = parseInt(caculAverage(result1[1].dps));
-	        rowData[index].URT = parseInt(caculAverage(result1[2].dps));
-	        rowData[index].QPScontrast = parseInt(caculAverage(result2[0].dps) / 60);
-	        rowData[index].RTcontrast = parseInt(caculAverage(result2[1].dps));
-	        rowData[index].URTcontrast = parseInt(caculAverage(result2[2].dps));
-
-	        this.setState({
-	          rowData: rowData
-	        });
-	      } catch (e) {
-	        console.error(e);
-	      }
-	    }).bind(this));
+	    return $.when(p1, p2);
 	  }
 	};
 
@@ -612,7 +620,7 @@ webpackJsonp([0],{
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	var React = __webpack_require__(1);
-	var mui = __webpack_require__(197);
+	var mui = __webpack_require__(201);
 	var Table = mui.Table;
 	var hack = __webpack_require__(355);
 	var Link = __webpack_require__(157).Link;
@@ -659,17 +667,6 @@ webpackJsonp([0],{
 	  }
 	};
 	var colOrder = ['core', 'feature', 'URL', 'RT', 'RTtrend', 'URT', 'URTtrend', 'QPS', 'QPStrend'];
-	var tableConfig = {
-	  fixedHeader: true,
-	  stripedRows: false,
-	  showRowHover: true,
-	  selectable: true,
-	  multiSelectable: false,
-	  deselectOnClickaway: true,
-	  displayRowCheckbox: false,
-	  displaySelectAll: false,
-	  height: '600px'
-	};
 
 	module.exports = React.createClass({
 	  displayName: 'exports',
@@ -740,7 +737,7 @@ webpackJsonp([0],{
 	        headerColumns: headerCols,
 	        columnOrder: colOrder,
 	        rowData: rowData
-	      }, tableConfig))
+	      }, this.tableConfig))
 	    );
 	  }
 	});
@@ -755,7 +752,7 @@ webpackJsonp([0],{
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	var React = __webpack_require__(1);
-	var mui = __webpack_require__(197);
+	var mui = __webpack_require__(201);
 	var DropDownMenu = mui.DropDownMenu;
 	var TextField = mui.TextField;
 	var ButtonSelects = __webpack_require__(362);
@@ -895,7 +892,7 @@ webpackJsonp([0],{
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	var React = __webpack_require__(1);
-	var mui = __webpack_require__(197);
+	var mui = __webpack_require__(201);
 	var RaisedButton = mui.RaisedButton;
 	var FlatButton = mui.FlatButton;
 
@@ -1084,7 +1081,6 @@ webpackJsonp([0],{
 	      etime: parseInt(new Date() / 1000),
 	      aggregator: this.props.aggregator || 'avg',
 	      metrics: [this.props.metrics],
-	      ignoreCache: false,
 	      tags: { service: service, method: method }
 	    };
 
