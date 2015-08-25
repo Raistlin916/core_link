@@ -46,17 +46,6 @@ let headerCols = {
   }
 };
 let colOrder = ['core', 'feature', 'URL', 'RT', 'RTtrend', 'URT', 'URTtrend', 'QPS', 'QPStrend'];
-let tableConfig = {
-  fixedHeader: true,
-  stripedRows: false,
-  showRowHover: true,
-  selectable: true,
-  multiSelectable: false,
-  deselectOnClickaway: true,
-  displayRowCheckbox: false,
-  displaySelectAll: false,
-  height: '600px',
-};
 
 
 module.exports = React.createClass({
@@ -121,7 +110,7 @@ module.exports = React.createClass({
         headerColumns={headerCols}
         columnOrder={colOrder}
         rowData={rowData}
-        {...tableConfig} />
+        {...this.tableConfig} />
       </div>
       )
   }

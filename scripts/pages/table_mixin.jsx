@@ -3,7 +3,7 @@ let apiAddress = require('../config').apiAddress;
 let $ = require('jquery');
 
 let TableMixin = {
-   getInitialState: function () {
+  getInitialState: function () {
     return {
       rowData: pagesData.map(function (item) {
         return {
@@ -21,6 +21,19 @@ let TableMixin = {
       })
     }
   },
+
+  tableConfig: {
+    fixedHeader: true,
+    stripedRows: false,
+    showRowHover: true,
+    selectable: true,
+    multiSelectable: false,
+    deselectOnClickaway: true,
+    displayRowCheckbox: false,
+    displaySelectAll: false,
+    height: '600px',
+  },
+
   componentDidMount: function () {
     this.interval = setInterval(function () {
       this.updateAllRow();
@@ -39,8 +52,18 @@ let TableMixin = {
     }.bind(this));
   },
 
+  caculAverage: function (dps) {
+    let sum = 0;
+    let ks = Object.keys(dps);
+    ks.forEach(function (k) {
+      sum += dps[k];
+    });
+    return sum/ks.length;
+  },
+
   fetchItemData: function (service, method, index) {
-    var time = parseInt((new Date)/1000);
+    let time = parseInt((new Date)/1000);
+    let caculAverage = this.caculAverage;
 
     let requestOption = {
       business: 'youzan_core_service',
@@ -62,15 +85,6 @@ let TableMixin = {
       {
         query: JSON.stringify(requestOption)
       });
-
-    function caculAverage(dps) {
-      let sum = 0;
-      let ks = Object.keys(dps);
-      ks.forEach(function (k) {
-        sum += dps[k];
-      });
-      return sum/ks.length;
-    }
 
     $.when(p1, p2)
       .then(function (res1, res2) {

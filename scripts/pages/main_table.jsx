@@ -6,17 +6,7 @@ let Link = require('react-router').Link;
 let ArrowSpan = require('../components/arrow_span');
 let TableMixin = require('./table_mixin');
 
-let tableConfig = {
-  fixedHeader: true,
-  stripedRows: false,
-  showRowHover: true,
-  selectable: true,
-  multiSelectable: false,
-  deselectOnClickaway: true,
-  displayRowCheckbox: false,
-  displaySelectAll: false,
-  height: '600px'
-};
+
 let headerCols = {
   core: {
     content: '核心链路'
@@ -142,7 +132,7 @@ module.exports = React.createClass({
         headerColumns={headerCols}
         columnOrder={colOrder}
         rowData={rowData}
-        {...tableConfig} />
+        {...this.tableConfig} />
       )
   }
 });

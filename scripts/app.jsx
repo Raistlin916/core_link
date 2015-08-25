@@ -9,19 +9,14 @@ let RouteHandler = Router.RouteHandler;
 let Link = require('react-router').Link;
 
 
-var ReactAdd = require('react/addons');
-var PureRenderMixin = ReactAdd.addons.PureRenderMixin;
-var NavigationClose = React.createClass({
-  displayName: 'NavigationClose',
-
-  mixins: [PureRenderMixin],
+let NavigationClose = React.createClass({
 
   goIndex: function() {
-      window.location.hash = '';
+    window.location.hash = '';
   },
 
   render: function () {
-    var contentStyle = {
+    let contentStyle = {
       backgroundImage:'url(./images/logo@2x.png)',
       height: '35px',
       width: '30px',
@@ -49,15 +44,15 @@ let App = React.createClass({
     };
   },
   render: function () {
-    var contentStyle = {
+    let contentStyle = {
       'fontFamily': "PingHei, STHeitiSC-Light, 'Helvetica Neue', Helvetica, Arial, sans-serif"
     };
 
-    var toMainPage = function () {
+    let toMainPage = function () {
       location.hash = '#';
     };
 
-    var mainStyle = {
+    let mainStyle = {
       width: '1200px',
       margin: '40px auto'
     };

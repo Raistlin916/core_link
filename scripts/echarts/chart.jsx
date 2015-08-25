@@ -107,7 +107,6 @@ module.exports = React.createClass({
       etime: parseInt((new Date)/1000),
       aggregator: this.props.aggregator || 'avg',
       metrics: [this.props.metrics],
-      ignoreCache: false,
       tags:{service: service, method: method}
     };
 
