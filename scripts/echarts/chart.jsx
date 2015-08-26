@@ -24,6 +24,7 @@ module.exports = React.createClass({
     let config = {
       showLoading: false,
       tooltip: {
+          trigger: 'axis',
           show: true
       },
       toolbox: {
@@ -103,7 +104,7 @@ module.exports = React.createClass({
 
     let requestOption = {
       business: 'youzan_core_service',
-      stime: parseInt((new Date - t)/1000),
+      stime: parseInt((new Date - t)/1000) + 60,
       etime: parseInt((new Date)/1000),
       aggregator: this.props.aggregator || 'avg',
       metrics: [this.props.metrics],
