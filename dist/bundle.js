@@ -221,9 +221,9 @@ webpackJsonp([0],{
 	    });
 
 	    rowData.forEach(function (item) {
-	      item.QPStrend = ~ ~((1 - item.QPScontrast / item.QPS) * 100);
-	      item.RTtrend = ~ ~((1 - item.RTcontrast / item.RT) * 100);
-	      item.URTtrend = ~ ~((1 - item.RTcontrast / item.RT) * 100);
+	      item.QPStrend = ~ ~((item.QPS - item.QPScontrast) / item.QPScontrast * 100);
+	      item.RTtrend = ~ ~((item.RT - item.RTcontrast) / item.RTcontrast * 100);
+	      item.URTtrend = ~ ~((item.URT - item.URTcontrast) / item.URTcontrast * 100);
 
 	      Object.keys(item).forEach(function (k) {
 	        if (k == 'core') {
@@ -678,9 +678,9 @@ webpackJsonp([0],{
 
 	    rowData.forEach(function (item) {
 	      var id = item.id;
-	      item.QPStrend = ~ ~((1 - item.QPScontrast / item.QPS) * 100);
-	      item.RTtrend = ~ ~((1 - item.RTcontrast / item.RT) * 100);
-	      item.URTtrend = ~ ~((1 - item.URTcontrast / item.RT) * 100);
+	      item.QPStrend = ~ ~((item.QPS - item.QPScontrast) / item.QPScontrast * 100);
+	      item.RTtrend = ~ ~((item.RT - item.RTcontrast) / item.RTcontrast * 100);
+	      item.URTtrend = ~ ~((item.URT - item.URTcontrast) / item.URTcontrast * 100);
 
 	      Object.keys(item).forEach(function (k) {
 	        if (k == 'feature') {
