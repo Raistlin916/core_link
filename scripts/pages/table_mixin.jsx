@@ -63,7 +63,7 @@ let TableMixin = {
 
   fetchItemData: function (service, method, index) {
     let caculAverage = this.caculAverage;
-    this.fetchMetaData(service, method, 'avg',  ['rt', 'urt'])
+    this.fetchMetaData(service, method, 'avg',  ['rt', 'urt'], 0)
       .then(function (res1, res2) {
         let result1 = res1[0].result;
         let result2 = res2[0].result;
@@ -94,7 +94,7 @@ let TableMixin = {
       }.bind(this));
   },
 
-  fetchMetaData: function (service, method, aggregator, metrics) {
+  fetchMetaData: function (service, method, aggregator, metrics, code) {
     let time = parseInt((new Date)/1000);
     let requestOption = {
       business: 'youzan_core_service',
@@ -102,7 +102,7 @@ let TableMixin = {
       etime: time - 60,
       aggregator: aggregator,
       metrics: metrics,
-      tags:{service: service, method: method}
+      tags:{service: service, method: method, code: code}
     };
 
     let p1 = $.get(apiAddress + '/monitor/pull',

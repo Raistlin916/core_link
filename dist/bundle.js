@@ -412,7 +412,7 @@ webpackJsonp([0],{
 
 	  fetchItemData: function fetchItemData(service, method, index) {
 	    var caculAverage = this.caculAverage;
-	    this.fetchMetaData(service, method, 'avg', ['rt', 'urt']).then((function (res1, res2) {
+	    this.fetchMetaData(service, method, 'avg', ['rt', 'urt'], 0).then((function (res1, res2) {
 	      var result1 = res1[0].result;
 	      var result2 = res2[0].result;
 	      var rowData = this.state.rowData;
@@ -441,7 +441,7 @@ webpackJsonp([0],{
 	    }).bind(this));
 	  },
 
-	  fetchMetaData: function fetchMetaData(service, method, aggregator, metrics) {
+	  fetchMetaData: function fetchMetaData(service, method, aggregator, metrics, code) {
 	    var time = parseInt(new Date() / 1000);
 	    var requestOption = {
 	      business: 'youzan_core_service',
@@ -449,7 +449,7 @@ webpackJsonp([0],{
 	      etime: time - 60,
 	      aggregator: aggregator,
 	      metrics: metrics,
-	      tags: { service: service, method: method }
+	      tags: { service: service, method: method, code: code }
 	    };
 
 	    var p1 = $.get(apiAddress + '/monitor/pull', {
@@ -832,7 +832,7 @@ webpackJsonp([0],{
 	          null,
 	          'RT趋势图'
 	        ),
-	        React.createElement(Chart, _extends({}, this.state, { metrics: 'RT', YUnit: 'ms' }))
+	        React.createElement(Chart, _extends({}, this.state, { metrics: 'rt', metricsName: 'RT', YUnit: 'ms', code: '0' }))
 	      ),
 	      React.createElement(
 	        'div',
@@ -842,7 +842,7 @@ webpackJsonp([0],{
 	          null,
 	          'URT趋势图'
 	        ),
-	        React.createElement(Chart, _extends({}, this.state, { metrics: 'URT', YUnit: 'ms' }))
+	        React.createElement(Chart, _extends({}, this.state, { metrics: 'urt', metricsName: 'URT', YUnit: 'ms', code: '0' }))
 	      ),
 	      React.createElement(
 	        'div',
@@ -1084,6 +1084,10 @@ webpackJsonp([0],{
 	      metrics: [this.props.metrics],
 	      tags: { service: service, method: method }
 	    };
+
+	    if (this.props.code) {
+	      requestOption.tags.code = this.props.code;
+	    }
 
 	    var p = $.get(apiAddress + '/monitor/pull', {
 	      query: JSON.stringify(requestOption)

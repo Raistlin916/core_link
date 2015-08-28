@@ -111,6 +111,10 @@ module.exports = React.createClass({
       tags:{service: service, method: method}
     };
 
+    if (this.props.code) {
+      requestOption.tags.code = this.props.code;
+    }
+
     let p = $.get(apiAddress + '/monitor/pull',
       {
         query: JSON.stringify(requestOption)
